@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="styles/demo.css">
+</head>
+<body>
+	<!--这是我们的View-->
+	<div id="app">
+		<ul class="pagination">
+			<!-- 在1.x版本此处n从0开始，2.x版本n从1开始 -->
+			<li v-for="n in pageCount">
+				<a href="javascript:void(0)" v-bind:class="activeNumber === n+1?'active':''">{{n}}</a>	
+			</li>
+		</ul>
+	</div>
+</body>
+<!-- <script src="http://static.runoob.com/assets/vue/1.0.11/vue.min.js"></script> -->
+<script type="text/javascript" src="js/vue.js"></script>
+<script>
+	var vm=new Vue({
+		el : '#app',
+		data : {
+			activeNumber : 1,
+			pageCount : 10
+		}
+	})
+</script>
+</html>

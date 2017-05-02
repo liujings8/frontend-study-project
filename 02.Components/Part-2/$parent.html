@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="app">
+        <parent-component></parent-component>
+    </div>
+
+    <template id="parent-component">
+        <child-component></child-component>
+    </template>
+
+    <template id="child-component">
+        <h2>This is child component</h2>
+        <button v-on:click="showParentComponentData">显示父组件的数据</button>
+    </template>
+
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+    Vue.component('parent-component',{
+        template : '#parent-component',
+        components : {
+            'child-component': {
+                template : '#child-component',
+                methods : {
+                    showParentComponentData :function () {
+                            alert(this.$parent.msg);
+                    }
+                }
+            }
+        },
+        data : function () {
+            return {
+                msg : 'parent component message'
+            }
+        }
+    });
+
+    new Vue({
+       el : '#app'
+    });
+
+
+</script>
+</html>

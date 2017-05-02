@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div id="app">
+		<my-component></my-component>	
+	</div>
+	
+	<script type="text/x-template" id="myComponent">
+		<div>This is a component!</div>
+	</script>
+	
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+	
+	/* template选项现在不再是HTML元素，而是一个id，
+		Vue.js根据这个id查找对应的元素，
+		然后将这个元素内的HTML作为模板进行编译。 */
+	/* 注意：使用<script>标签时，type指定为text/x-template，
+		意在告诉浏览器这不是一段js脚本，
+		浏览器在解析HTML文档时会忽略<script>标签内定义的内容。 */
+	Vue.component('my-component',{
+		template : '#myComponent'
+	});
+	
+	new Vue({
+		el : '#app'
+	}); 
+
+</script>
+</html>
