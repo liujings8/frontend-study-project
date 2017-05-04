@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--参考地址：http://blog.csdn.net/hayre/article/details/60572435-->
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="counter-event-example">
+        <p>{{ total }}</p>
+        <button-counter v-on:increment--="incrementTotal"></button-counter>
+        <button-counter v-on:increment--="incrementTotal"></button-counter>
+    </div>
+
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+    /*使用 $on(eventName) 监听事件
+     使用 $emit(eventName) 触发事件*/
+    Vue.component('button-counter',{
+        template : '<button v-on:click="increment">{{ counter }}</button>',
+        data : function () {
+            return {
+                counter : 0
+            }
+        },
+        methods : {
+            increment :function () {
+                this.counter +=1;
+                alert('counter:'+this.counter);
+                this.$emit('increment--');
+            }
+        }
+    });
+
+    new Vue({
+        el : '#counter-event-example',
+        data : {
+            total : 0
+        },
+        methods : {
+            incrementTotal : function () {
+                this.total +=1;
+                alert('total:'+this.total);
+            }
+        }
+    });
+
+
+</script>
+</html>
