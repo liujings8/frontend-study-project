@@ -1,113 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /*
+         * 由于IE不支持<template>标签，所以template标签中的内容在IE下会直接显示出来。
+         * 将模板设为隐藏即可解决这个问题，template标签各浏览器支持请参考：http://caniuse.com/#feat=template
+         */
+        #grid-template{
+            display : none;
+        }
+    </style>
+</head>
+<!--
+    第一步-----创建表格组件,添加过滤,数据删除功能
+-->
+<body>
+    <div id="app">
+        <div class="container">
+            <label>Search</label>
+             <input type="text" class="search-input" v-model="searchQuery">
+        </div>
+        <div class="container">
+            <!--    使用了v-bind指令的缩写。 -->
+            <simple-grid :data-list="people" :columns="columns" :search-key="searchQuery"></simple-grid>
+        </div>
+    </div>
 
-	<head>
-		<meta charset="UTF-8">
-		<title></title>
-		<link rel="stylesheet" href="style.css" />		
-		<style>
-			/* 
-			 * 由于IE不支持<template>标签，所以template标签中的内容在IE下会直接显示出来。
-			 * 将模板设为隐藏即可解决这个问题，template标签各浏览器支持请参考：http://caniuse.com/#feat=template
-			 */
-			#grid-template{
-				display: none;
-			}
-		</style>	
-	</head>
+    <template id="grid-template">
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="col in columns">
+                        <!--    使用了capitalize过滤器，将字符串的首字母转换为大写后输出。  -->
+                        {{ col.name | capitalize }}
+                    </th>
+                    <th>
+                        Delete
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--    使用了filterBy过滤器，根据指定条件过滤数组元素，filterBy返回过滤后的数组。   -->
+                <tr v-for="(index,entry) in dataList | filterBy searchKey">
+                    <td v-for="col in columns">
+                        {{ entry[col.name] }}
+                    </td>
+                    <td class="text-center">
+                        <!--    使用了v-on指令的缩写，@click是v-on:click的缩写。  -->
+                        <button @click="deleteItem(index)">delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+</body>
+<script type="text/javascript" src="../js/vue.js"></script>
+<script>
+    /*  Vue.component是创建并注册组件的语法糖，使用Vue.component注册的组件是全局的。 */
+    Vue.component('simple-grid',{
+        template : '#grid-template',
+        /*  #app元素是父组件，simple-grid是子组件。
+         在simple-grid组件中定义选项props: ['dataList', 'columns', 'searchKey']
+         在#app下使用<simple-grid :data-list="people" :columns="columns" :search-key="searchQuery">
+         将数据传递给simple-grid组件    */
+        props : ['dataList','columns','searchKey'],
+        methods : {
+            deleteItem : function(index){
+                this.dataList.splice(index,1);
+            }
+        }
+    });
 
-	<body>
-		<div id="app">
-			<div class="container">
-				<div class="form-group">
-					<label>Search</label>
-					<input type="text" class="search-input" v-model="searchQuery" />
-				</div>
+    var demo=new Vue({
+        el : '#app',
+        data : {
+            searchQuery : '',
+            columns : [{
+                name : 'name'
+            },{
+                name : 'age'
+            },{
+                name : 'sex'
+            }],
+            people : [{
+                name : 'Jack',
+                age : 30,
+                sex : 'Male'
+            },{
+                name : 'Bill',
+                age : 26,
+                sex : 'Male'
+            },{
+                name : 'Tracy',
+                age : 22,
+                sex : 'Female'
+            },{
+                name : 'Chris',
+                age : 36,
+                sex : 'Male'
+            }]
+        }
+    });
 
-			</div>
-			<div class="container">
-				<simple-grid :data-list="people" :columns="columns" :search-key="searchQuery">
-				</simple-grid>
-			</div>
-		</div>
 
-		<template id="grid-template">
-			<table>
-				<thead>
-					<tr>
-						<th v-for="col in columns">
-							{{ col.name | capitalize}}
-						</th>
-						<th>
-							Delete
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="(index,entry) in dataList | filterBy searchKey">
-						<td v-for="col in columns">
-							{{entry[col.name]}}
-						</td>
-						<td class="text-center">
-							<button class="btn-danger" @click="deleteItem(entry)">delete</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</template>
-
-		<script src="../js/vue.js"></script>
-		<script>
-			Vue.component('simple-grid', {
-				template: '#grid-template',
-				props: ['dataList', 'columns', 'searchKey'],
-
-				methods: {
-					deleteItem: function(entry) {
-						
-						var data = this.dataList
-						data.forEach(function(item, i){
-							if(item === entry){
-								data.splice(i, 1)
-								return
-							}
-						})
-					},
-				}
-			})
-
-			var demo = new Vue({
-				el: '#app',
-				data: {
-					searchQuery: '',
-					columns: [{
-						name: 'name'
-					}, {
-						name: 'age'
-					}, {
-						name: 'sex'
-					}],
-					people: [{
-						name: 'Jack',
-						age: 30,
-						sex: 'Male'
-					}, {
-						name: 'Bill',
-						age: 26,
-						sex: 'Male'
-					}, {
-						name: 'Tracy',
-						age: 22,
-						sex: 'Female'
-					}, {
-						name: 'Chris',
-						age: 36,
-						sex: 'Male'
-					}]
-				}
-			})
-		</script>
-
-	</body>
-
+</script>
 </html>

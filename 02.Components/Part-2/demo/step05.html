@@ -1,297 +1,334 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /*
+         * 由于IE不支持<template>标签，所以template标签中的内容在IE下会直接显示出来。
+         * 将模板设为隐藏即可解决这个问题，template标签各浏览器支持请参考：http://caniuse.com/#feat=template
+         */
+        #grid-template{
+            display : none;
+        }
+    </style>
+</head>
+<!--
+    第一步-----创建表格组件,添加过滤,数据删除功能
+    第二步-----创建对话框组件
+    第三步-----实现数据新建功能
+    第四步-----实现数据修改功能
+    第五步-----修改数据新建功能
+-->
+<body>
+    <div id="app">
+        <div class="container">
+            <label>Search</label>
+             <input type="text" class="search-input" v-model="searchQuery">
+        </div>
+        <div class="container">
+            <!--    使用了v-bind指令的缩写。 -->
+            <simple-grid :data-list="people" :columns="columns" :search-key="searchQuery"></simple-grid>
+        </div>
+    </div>
 
-	<head>
-		<meta charset="UTF-8">
-		<title></title>
-		<link rel="stylesheet" href="style.css" />
-		<style>
-			/* 
-			 * 由于IE不支持<template>标签，所以template标签中的内容在IE下会直接显示出来。
-			 * 将模板设为隐藏即可解决这个问题，template标签各浏览器支持请参考：http://caniuse.com/#feat=template
-			 */
-			
-			#grid-template,
-			#dialog-template {
-				display: none;
-			}
-		</style>
-	</head>
+    <template id="grid-template">
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="col in columns">
+                        <!--    使用了capitalize过滤器，将字符串的首字母转换为大写后输出。  -->
+                        {{ col.name | capitalize }}
+                    </th>
+                    <th>
+                        Delete
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--    使用了filterBy过滤器，根据指定条件过滤数组元素，filterBy返回过滤后的数组。   -->
+                <tr v-for="(index,entry) in dataList | filterBy searchKey">
+                    <td v-for="col in columns">
+                        <span v-if="col.isKey">
+                            <a href="javascript:void(0)" @click="openEditItemDialog(entry[col.name],'Edit ITEM '+entry[col.name])">
+                                {{ entry[col.name] }}
+                            </a>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <!--    使用了v-on指令的缩写，@click是v-on:click的缩写。  -->
+                        <button @click="deleteItem(entry)">delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="container">
+            <button @click="openNewItemDialog('Create New item')">Create</button>
+        </div>
+        <!--    在<modal-dialog>标签上给sample-grid绑定一个自定义事件create-item，后面在$dispatch派发事件时会用到。    -->
 
-	<body>
-		<div id="app">
-			<div class="container">
-				<div class="form-group">
-					<label>Search</label>
-					<input type="text" class="search-input" v-model="searchQuery" />
-				</div>
+        <!--create-item是一个自定义事件，
+            由子组件modal-dialog调用this.$dispatch('create-item') 派发到自定义事件create-item，
+            自定义事件create-item是绑定在父组件simple-grid上的，该事件会执行createItem方法。
+        -->
+        <modal-dialog :mode="mode" :title="title" :fields="columns"
+                        :item="item" v-on:create-item="createItem" v-on:update-item="updateItem">
+        </modal-dialog>
+    </template>
 
-			</div>
-			<div class="container">
-				<simple-grid :data-list="people" :columns="columns" :search-key="searchQuery">
-				</simple-grid>
-			</div>
-		</div>
+    <template id="dialog-template">
+        <div class="dialogs">
+            <div class="dialog" v-bind:class="{ 'dialog-active':show }">
+                <div class="dialog-content">
+                    <header class="dialog-header">
+                        <h1 class="dialog-title">{{ title }}</h1>
+                    </header>
+                    <div v-for="field in fields" class="form-group">
+                        <label>{{ field.name }}</label>
+                        <!--在修改模式下（mode = 2），如果当前字段是主键字段，则禁止修改。-->
+                        <select v-if="field.dataSource" v-model="item[field.name]" :disabled="mode===2 && field.isKey">
+                            <option v-for="opt in field.dataSource" :value="opt">{{ opt }}</option>
+                        </select>
+                        <input v-else type="text" v-model="item[field.name]" :disabled="mode===2 && field.isKey">
+                    </div>
+                    <footer class="form-group">
+                        <label></label>
+                        <button class="btn-save" v-on:click="save">Save</button>
+                        <button class="btn-close" v-on:click="close">Close</button>
+                    </footer>
+                </div>
+            </div>
+            <!--overlay 覆盖、镀金、轮廓-->
+            <div class="dialog-overlay"></div>
+        </div>
+    </template>
 
-		<template id="grid-template">
-			<table>
-				<thead>
-					<tr>
-						<th v-for="col in columns">
-							{{ col.name | capitalize}}
-						</th>
-						<th>
-							Delete
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="(index,entry) in dataList | filterBy searchKey">
-						<td v-for="col in columns">
-							<span v-if="col.isKey"><a href="javascript:void(0)" @click="openEditItemDialog(entry[col.name])">{{entry[col.name]}}</a></span>
-							<span v-else>{{entry[col.name]}}</span>
-						</td>
-						<td class="text-center">
-							<button class="btn-danger" @click="deleteItem(entry)">delete</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<div class="container">
-				<button class="btn" @click="openNewItemDialog('Create New Item')">Create</button>
-			</div>
+</body>
+<script type="text/javascript" src="../js/vue.js"></script>
+<script>
+    /*  Vue.component是创建并注册组件的语法糖，使用Vue.component注册的组件是全局的。 */
+    Vue.component('simple-grid',{
+        template : '#grid-template',
+        /*  #app元素是父组件，simple-grid是子组件。
+         在simple-grid组件中定义选项props: ['dataList', 'columns', 'searchKey']
+         在#app下使用<simple-grid :data-list="people" :columns="columns" :search-key="searchQuery">
+         将数据传递给simple-grid组件    */
+        props : ['dataList','columns','searchKey'],
+        /*  组件的data选项必须以函数的方式返回 */
+        data : function() {
+            return {
+                mode : 0,
+                item : {},
+                keyColumn : '',
+                title : ''
+            }
+        },
+        /*  ready()函数会在编译结束和 $el 第一次插入文档之后调用，
+            你可以将其理解为jQuery中的document.ready()。
+            在ready()函数中，初始化keyColumn，keyColumn表示主键列，
+            调用updateItem方法时，会根据主键数据找到dataList中匹配的元素。
+        */
+        ready : function(){
+            for(var i=0;i<this.columns.length;i++){
+                if(this.columns[i].isKey){
+                    this.keyColumn = this.columns[i]['name'];
+                    //alert(this.keyColumn);
+                    break;
+                }
+            }
+        },
+        methods : {
+            /*opeNewItemDialog方法用于打开对话框，this.$broadcast('showDialog', true)
+                调用子组件modal-dialog的showDialog事件，传入参数true表示显示对话框。*/
+            openNewItemDialog : function(title){
+                //  对话框的标题
+                this.title = title;
+                //  mode=1表示新建模式
+                this.mode = 1;
+                //  初始化this.item
+                this.item = {};
+                /*  广播事件，showDialog是modal-dialog组件的一个方法,
+                    传入参数true表示显示
+                 */
+                this.$broadcast('showDialog',true);
+            },
+            openEditItemDialog : function (key,title) {
+                alert(key);
+                //根据主键查找当前修改的数据
+                var currentItem = this.findItemByKey(key);
+                //对话框的标题
+                this.title = title;
+                //mode=2表示修改模式
+                this.model = 2;
+                //初始化this.item
+                this.item = {};
+                //将选中的数据拷贝到this.item
+                this.item = this.initItemForUpdate(currentItem);
+                //广播事件，传入参数true表示显示对话框
+                this.$broadcast('showDialog',true);
+            },
+            /*createItem方法用于保存新建的数据，this.$broadcast('showDialog', false)
+                调用子组件modal-dialog的showDialog事件，传入参数false表示隐藏对话框。*/
+            /*由于主键列数据是不能重复的，所以在新增数据时需要判断主键列数据是否已经存在。*/
+            createItem : function(){
+                var keyColumn = this.keyColumn;
+                if(!this.itemExists(keyColumn)){
+                    //将item追加到dataList
+                    this.dataList.push(this.item);
+                    //广播事件。传入参数false表示隐藏对话框
+                    this.$broadcast('showDialog',false);
+                    //  新建完数据后，重置item对象
+                    this.item = {};
+                }else{
+                    alert(keyColumn + ' "' + this.item[keyColumn] + '" is already exists');
+                }
 
-			<modal-dialog :mode="mode" :title="title" :item="item" :fields="columns" v-on:create-item="createItem" v-on:update-item="updateItem">
-			</modal-dialog>
+            },
+            itemExists : function (keyColumn) {
+                alert(keyColumn);
+                for(var i=0;i<this.dataList.length;i++){
+                    if(this.item[keyColumn] === this.dataList[i][keyColumn]){
+                        return true;
+                    }
+                }
+                return false;
+            },
+            deleteItem : function(entry){
+                var data = this.dataList;
+                data.forEach(function(item,i){
+                    if(item === entry){
+                        data.splice(i,1);
+                        return
+                    }
+                });
+            },
+            //  弹出修改数据的对话框时，使用对象的深拷贝
+            initItemForUpdate : function (p) {
+                var c = c || {};
+                for(var i in p){
+                    //  属性i是否为p对象的自我属性
+                    //alert(i);
+                    /*  hasOwnProperty() 方法会返回一个布尔值,指示对象是否具有指定的属性作为自身(不继承)属性。*/
+                    if(p.hasOwnProperty(i)){
+                        if(typeof p[i] === 'object'){
+                            c[i] = Array.isArray(p[i]) ? [] : {};
+                            deepCopy(p[i],c[i]);
+                        }else{
+                            //属性是基础类型时，直接拷贝
+                            c[i] = p[i];
+                        }
+                    }
+                }
+                return c;
+            },
+            findItemByKey : function (key) {
+                var keyColumn = this.keyColumn;
+                for(var i=0;i<this.dataList.length;i++){
+                    if(this.dataList[i][keyColumn] === key){
+                        return this.dataList[i];
+                    }
+                }
+            },
+            updateItem : function () {
+                //  获取主键列
+                var keyColumn = this.keyColumn;
+                for(var i=0;i<this.dataList.length;i++){
+                    //根据主键查找要修改的数据，然后将this.item数据更新到this.dataList[i]
+                    if(this.dataList[i][keyColumn] ===this.item[keyColumn]){
+                        for(var j in this.item){
+                            this.dataList[i][j] = this.item[j]
+                        }
+                        break;
+                    }
+                }
+                //  广播事件，传入参数false表示隐藏对话框
+                this.$broadcast('showDialog',false);
+                //  修改完数据后，重置item对象
+                this.item = {};
+            }
+        },
+        /*  modal-dialog组件在simple-grid组件中注册：    */
+        components : {
+            'modal-dialog' : {
+                template : '#dialog-template',
+                data : function () {
+                    return {
+                        //  对话框默认是不显示的
+                        show : false
+                    }
+                },
+                /*
+                 * mode = 1是新增数据模式，mode = 2是修改数据模式
+                 * title表示对话框的标题内容
+                 * fields表示对话框要显示的数据字段数组
+                 * item是由simple-grid传下来，用于绑定表单字段的
+                 */
+                props : ['mode','title','fields','item'],
+                methods : {
+                    close : function () {
+                        this.show = false;
+                    },
+                    save : function () {
+                       //   新建模式
+                        if(this.mode === 1){
+                            /*  由于保存按钮是在子组件modal-dialog中的，
+                                而createItem方法是在父组件simple-grid中的，
+                                所以这里使用this.$dispatch('create-item') 派发到父组件的自定义事件create-item。
+                            */
+                            //使用$dispatch调用simple-grid的create-item方法
+                            this.$dispatch('create-item');
+                        }else if(this.mode === 2){
+                            //使用$dispatch调用simple-grid的update-item方法
+                            this.$dispatch('update-item');
+                        }
+                    }
+                },
+                /*之前把events放进methods里面...找了很久*/
+                events :{
+                    //  显示或隐藏对话框
+                    'showDialog':function(show){
+                        this.show = show;
+                    }
+                }
+            }
+        }
+    });
 
-		</template>
-
-		<template id="dialog-template">
-			<div class="dialogs">
-				<div class="dialog" v-bind:class="{ 'dialog-active': show }">
-					<div class="dialog-content">
-						<header class="dialog-header">
-							<h1 class="dialog-title">{{ title }}</h1>
-						</header>
-						<div class="dialog-body">
-							<div v-for="field in fields" class="form-group">
-								<label>{{ field.name }}</label>
-								<select v-if="field.dataSource" v-model="item[field.name]" :disabled="mode === 2 && field.isKey">
-									<option v-for="opt in field.dataSource" :value="opt">{{ opt }}</option>
-								</select>
-								<input v-else type="text" v-model="item[field.name]" :disabled="mode === 2 && field.isKey">
-							</div>
-						</div>
-						<footer class="dialog-footer">
-							<div class="form-group">
-								<label></label>
-								<button class="btn-save" v-on:click="save">Save</button>
-								<button class="btn-close" v-on:click="close">Close</button>
-							</div>
-						</footer>
-					</div>
-				</div>
-				<div class="dialog-overlay"></div>
-			</div>
-		</template>
-
-		<script src="../js/vue.js"></script>
-		<script>
-			Vue.component('simple-grid', {
-				template: '#grid-template',
-				props: ['dataList', 'columns', 'searchKey'],
-				data: function() {
-					return {
-						mode: 0,
-						title: '',
-						keyColumn: '',
-						item: {}
-					}
-				},
-				ready: function() {
-					for(var i = 0; i < this.columns.length; i++) {
-						if(this.columns[i].isKey) {
-							this.keyColumn = this.columns[i]['name']
-							break;
-						}
-					}
-				},
-				methods: {
-					openNewItemDialog: function(title) {
-						// 对话框的标题
-						this.title = title
-						// mode = 1表示新建模式
-						this.mode = 1
-						// 初始化this.item
-						this.item = {}
-						// 广播事件，showDialog是modal-dialog组件的一个方法，传入参数true表示显示对话框
-						this.$broadcast('showDialog', true)
-					},
-					openEditItemDialog: function(key) {
-						// 根据主键查找当前修改的数据
-						var currentItem = this.findItemByKey(key)
-						// 对话框的标题
-						this.title = 'Edit Item - ' + key
-						// mode = 2表示修改模式
-						this.mode = 2
-						// 将选中的数据拷贝到this.item
-						this.item = this.initItemForUpdate(currentItem)
-						// 广播事件，传入参数true表示显示对话框
-						this.$broadcast('showDialog', true)
-					},
-					// 弹出修改数据的对话框时，使用对象的深拷贝
-					initItemForUpdate(p, c) {
-						c = c || {};
-						for(var i in p) {
-							// 属性i是否为p对象的自有属性
-							if(p.hasOwnProperty(i)) {
-								// 属性i是否为复杂类型
-								if(typeof p[i] === 'object') {
-									// 如果p[i]是数组，则创建一个新数组
-									// 如果p[i]是普通对象，则创建一个新对象
-									c[i] = Array.isArray(p[i]) ? [] : {};
-									// 递归拷贝复杂类型的属性
-									this.initItemForUpdate(p[i], c[i]);
-								} else {
-									// 属性是基础类型时，直接拷贝
-									c[i] = p[i];
-								}
-							}
-						}
-						return c;
-					},
-					findItemByKey: function(key) {
-						var keyColumn = this.keyColumn
-						for(var i = 0; i < this.dataList.length; i++) {
-							if(this.dataList[i][keyColumn] === key) {
-								return this.dataList[i]
-							}
-						}
-					},
-					itemExists: function() {
-						var keyColumn = this.keyColumn
-						for(var i = 0; i < this.dataList.length; i++) {
-							if(this.item[keyColumn] === this.dataList[i][keyColumn])
-								return true;
-						}
-						return false;
-					},
-					createItem: function() {
-						var keyColumn = this.keyColumn
-						if(!this.itemExists()) {
-							// 将item追加到dataList
-							this.dataList.push(this.item)
-							// 广播事件，传入参数false表示隐藏对话框
-							this.$broadcast('showDialog', false)
-							// 新建完数据后，重置item对象
-							this.item = {}
-						} else {
-							alert(keyColumn + ' "' + this.item[keyColumn] + '" is already exists')
-						}
-
-					},
-					updateItem: function() {
-
-						// 获取主键列
-						var keyColumn = this.keyColumn
-
-						for(var i = 0; i < this.dataList.length; i++) {
-							// 根据主键查找要修改的数据，然后将this.item数据更新到this.dataList[i]
-							if(this.dataList[i][keyColumn] === this.item[keyColumn]) {
-								for(var j in this.item) {
-									this.dataList[i][j] = this.item[j]
-								}
-								break;
-							}
-						}
-						// 广播事件，传入参数false表示隐藏对话框
-						this.$broadcast('showDialog', false)
-							// 修改完数据后，重置item对象
-						this.item = {}
-					},
-					deleteItem: function(entry) {
-						var data = this.dataList
-						data.forEach(function(item, i) {
-							if(item === entry) {
-								data.splice(i, 1)
-								return
-							}
-						})
-					}
-				},
-				components: {
-					'modal-dialog': {
-						template: '#dialog-template',
-						data: function() {
-							return {
-								// 对话框默认是不显示的
-								show: false
-							}
-						},
-						/*
-						 * mode = 1是新增数据模式，mode = 2是修改数据模式
-						 * title表示对话框的标题内容
-						 * fields表示对话框要显示的数据字段数组
-						 * item是由simple-dialog传下来，用于绑定表单字段的
-						 */
-						props: ['mode', 'title', 'fields', 'item'],
-						methods: {
-							close: function() {
-								this.show = false
-							},
-							save: function() {
-								if(this.mode === 1) {
-									// 使用$dispatch调用simple-grid的create-item事件
-									this.$dispatch('create-item')
-								} else if(this.mode === 2) {
-									// 使用$dispatch调用simple-grid的update-item事件
-									this.$dispatch('update-item')
-								}
-							}
-						},
-						events: {
-							'showDialog': function(show) {
-								this.show = show
-							}
-						}
-					}
-				}
-			})
-
-			var demo = new Vue({
-				el: '#app',
-				data: {
-					searchQuery: '',
-					columns: [{
-						name: 'name',
-						isKey: true
-					}, {
-						name: 'age'
-					}, {
-						name: 'sex',
-						dataSource: ['Male', 'Female']
-					}],
-					people: [{
-						name: 'Jack',
-						age: 30,
-						sex: 'Male'
-					}, {
-						name: 'Bill',
-						age: 26,
-						sex: 'Male'
-					}, {
-						name: 'Tracy',
-						age: 22,
-						sex: 'Female'
-					}, {
-						name: 'Chris',
-						age: 36,
-						sex: 'Male'
-					}]
-				}
-			})
-		</script>
-
-	</body>
-
+    var demo=new Vue({
+        el : '#app',
+        data : {
+            searchQuery : '',
+            columns : [{
+                name : 'name',
+                /*  为'name'列追加一个isKey属性，并设置为true，表示该列为主键列。    */
+                isKey : true
+            },{
+                name : 'age'
+            },{
+                name : 'sex',
+                /*  为'sex'列追加一个dataSoruce属性，并设置为['Male', 'Female']，
+                    表示新增或修改数据时选择性别的下拉框数据源。*/
+                dataSource : ['Male','Female']
+            }],
+            people : [{
+                name : 'Jack',
+                age : 30,
+                sex : 'Male'
+            },{
+                name : 'Bill',
+                age : 26,
+                sex : 'Male'
+            },{
+                name : 'Tracy',
+                age : 22,
+                sex : 'Female'
+            },{
+                name : 'Chris',
+                age : 36,
+                sex : 'Male'
+            }]
+        }
+    });
+</script>
 </html>
