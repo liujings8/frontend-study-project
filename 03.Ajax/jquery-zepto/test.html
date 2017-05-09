@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <simple-grid v-bind:data-list="gridData" v-bind:columns="gridColumns"></simple-grid>
+        </div>
+    </div>
+    <template id="grid-template">
+        <table>
+            <thead>
+                <tr>
+                    <th  v-for="col in columns">
+                        {{ col | capitalize}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(index,entry) in dataList">
+                    <td v-for="col in columns">
+                        {{ entry[col] }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+</body>
+<script type="text/javascript" src="js/vue.js"/>
+<script type="text/javascript" src="js/AjaxHelper.js"/>
+<script type="text/javascript" src="js/zepto.js"/>
+<script type="text/javascript">
+    Vue.component('simple-grid',{
+        template: '#grid-template',
+        props: ['dataList','columns']
+    });
+    var ajaxHepler=new AjaxHelper();
+    var demo = new Vue({
+        el: '#app',
+        data: {
+            gridColumns: ['name', 'age', 'sex', 'remark'],
+            gridData: [{
+                
+            }],
+            apiUrl: ''
+        },
+        ready: function () {
+            this.getCustomers();
+        },
+        methods: {
+            getCustomers : function () {
+                var vm =this;
+                var callback = function (data) {
+                    vm.$set('gridData',data);
+                };
+                ajaxHepler.get(vm.apiUrl,null,callback());
+            }
+        }
+
+    });
+
+</script>
+</html>
