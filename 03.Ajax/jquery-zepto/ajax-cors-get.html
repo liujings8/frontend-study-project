@@ -36,17 +36,17 @@
     </template>
 </body>
 <script type="text/javascript" src="js/vue.js"></script>
-<script type="text/javascript" src="js/AjaxHelper.js"></script>
 <script type="text/javascript" src="js/zepto.js"></script>
+<script type="text/javascript" src="js/AjaxHelper.js"></script>
 <script type="text/javascript">
     Vue.component('simple-grid', {
         template: '#grid-template',
         props: ['dataList', 'columns']
     });
-</script>
-<script type="text/javascript">
-    var ajaxHelper = new AjaxHelper();
+
     var demo = new Vue({
+        /*这个有时写漏了*/
+        el: '#app',
         data: {
             gridColumns: ['customerId', 'companyName', 'contactName', 'phone'],
             gridData: [],
@@ -58,10 +58,13 @@
         methods: {
             getCustomers: function () {
                 var vm = this;
-                callback = function (data) {
+                var callback = function (data) {
+                    alert('okok');
                     vm.$set('gridData',data);
                 };
-                ajaxHepler.get(vm.apiUrl,null,callback);
+                alert('okok');
+                //var ajaxHelper =
+                    new AjaxHelper().get(vm.apiUrl,null,callback);
             }
         }
     });
