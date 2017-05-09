@@ -44,6 +44,8 @@
         props: ['dataList', 'columns']
     });
 
+    var ajaxHelper = new AjaxHelper();
+
     var demo = new Vue({
         /*这个有时写漏了*/
         el: '#app',
@@ -59,12 +61,10 @@
             getCustomers: function () {
                 var vm = this;
                 var callback = function (data) {
-                    alert('okok');
                     vm.$set('gridData',data);
                 };
-                alert('okok');
-                //var ajaxHelper =
-                    new AjaxHelper().get(vm.apiUrl,null,callback);
+                /*出现过ajaxHelper未定义*/
+                ajaxHelper.get(vm.apiUrl,null,callback);
             }
         }
     });

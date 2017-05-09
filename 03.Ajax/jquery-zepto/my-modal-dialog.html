@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css"></link>
+    <link rel="stylesheet" href="fonts/iconfont.css"></link>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="form-group">
+                <button @click="this.show = true">Create</button>
+            </div>
+        </div>
+        <modal-dialog v-bind:show.sync="show">
+            <header class="dialog-header" slot="header">
+                <h1 class="dialog-title">Create New Customer</h1>
+            </header>
+            <div class="dialog-body" slot="body">
+                <div class="form-group" v-show="item.customerId">
+                    <label>Customer Id</label>
+                    <input type="text" v-model="item.customerId" />
+                </div>
+                <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" v-model="item.customerName" />
+                </div>
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" v-model="item.companyName" />
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <button @click="createCustomer">Save</button>
+                </div>
+            </div>
+        </modal-dialog>
+    </div>
+
+    <template id="dialog-tempalte">
+        <div class="dialogs">
+            <div class="dialog" v-bind:class="{ 'dialog-active': show}">
+                <div class="dialog-content">
+                    <div class="close roate">
+                        <span class="iconfont icon-close"></span>
+                    </div>
+                    <slot name="header"></slot>
+                    <slot name="body"></slot>
+                    <slot name="footer"></slot>
+                </div>
+            </div>
+            <div class="dialog-overlay"></div>
+        </div>
+    </template>
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+    Vue.component('modal-dialog',{
+        template: '#dialog-template',
+        props: ['show'],
+        methods: {
+            close: function () {
+                this.show = false;
+            }
+        }
+    });
+
+    var demo = new Vue({
+        
+    });
+
+</script>
+</html>
