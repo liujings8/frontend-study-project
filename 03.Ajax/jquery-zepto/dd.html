@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="fonts/iconfont.css" />
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="text" v-model="searchKey">
+            </div>
+        </div>
+        <div class="container">
+            <simple-grid :data-list="gridData" :search-key="searchKey" :columns="gridColumns" @load-entry="loadCustomer" @delete-entry="deleteCustomer">
+            </simple-grid>
+        </div>
+
+        <div class="container">
+            <div class="form-group">
+                <button @click="this.show = true">Create</button>
+            </div>
+        </div>
+
+        <modal-dialog v-bind:show.sync="show">
+            <header class="dialog-header" slot="header">
+                <h1 class="dialog-title">
+                    {{ item.customerId ? 'Edit '+item.contactName : 'Create New Customer' }}
+                </h1>
+            </header>
+            <div class="dialog-body" slot="body">
+                <div class="form-group" v-show="item.customerId">
+                    <label>Customer Id</label>
+                    <input type="text" v-model="item.customerId" disabled="disabled">
+                </div>
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" v-model="item.companyName">
+                </div>
+                <div class="form-group">
+                    <label>Contact Name</label>
+                    <input type="text" v-model="item.contactName">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" v-model="item.phone">
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <button @click="saveCustomer">Save</button>
+                </div>
+            </div>
+        </modal-dialog>
+    </div>
+    <template id="grid-template">
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="col in columns">
+                        {{ col.name | capitalize }}
+                    </th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(index, entry) in dataList | filterBy searchKey">
+                    <td v-for="col in columns">
+                        <span v-if="col.isKey">
+                            <a href="javascript:void(0)" @click="loadEntry(entry[col.name])">{{ entry[col.name] }}</a>
+                        </span>
+                        <span v-else>{{ entry[col.name] }}</span>
+                    </td>
+                    <td><button @click="deleteEntry(entry)">delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </template>
+
+    <template id="dialog-template">
+        <div class="dialogs">
+            <div class="dialog" v-bind:class="{ 'dialog-active': show }">
+                <div class="dialog-content">
+                    <div class="close rotate">
+                        <span class="iconfont icon-close" @click="close"></span>
+                    </div>
+                    <slot name="header"></slot>
+                    <slot name="body"></slot>
+                    <slot name="footer"></slot>
+                </div>
+            </div>
+            <div class="dialog-overlay"></div>
+        </div>
+    </template>
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/AjaxHelper.js"></script>
+<script type="text/javascript" src="js/zepto.js"></script>
+<script type="text/javascript">
+    Vue.component('simple-grid', {
+        template: '#grid-template',
+        props: ['dataList', 'columns', 'searchKey'],
+        methods: {
+            loadEntry: function (key) {
+                this.$dispatch('load-entry', key);
+            },
+            deleteEntry: function (entry) {
+                this.$dispatch('delete-entry', entry);
+            }
+        }
+    });
+
+    Vue.component('modal-dialog', {
+        template: '#dialog-template',
+        props: ['show'],
+        methods: {
+            close: function () {
+                this.show = false;
+            }
+        }
+    });
+
+    var ajaxHelper = new AjaxHelper();
+
+    var demo = new Vue({
+        el: '#app',
+        data: {
+            item: {},
+            show: false,
+            searchKey: '',
+            gridData: [],
+            gridColumns: [{
+                name: 'customerId',
+                isKey: true
+            },{
+                name: 'companyName'
+            },{
+                name: 'contactName'
+            },{
+                name: 'phone'
+            }],
+            apiUrl: 'http://211.149.193.19:8080/api/customers'
+        },
+        ready: function () {
+            this.getCustomers();
+        },
+        methods: {
+            getCustomers: function () {
+                var vm = this;
+                var callback = function (data) {
+                    vm.$set('gridData', data);
+                };
+                ajaxHelper.get(vm.apiUrl, null, callback);
+            },
+            saveCustomer: function () {
+                this.item.customerId ? this.updateCustomer() : this.createCustomer();
+                this.show = false;
+            },
+            createCustomer: function () {
+                var vm = this;
+                var callback = function (data) {
+                    vm.getCustomers();
+                };
+                ajaxHelper.post(vm.apiUrl,vm.item,callback);
+            },
+            deleteCustomer: function (item) {
+                var vm = this;
+                var callback = function () {
+                    vm.getCustomers();
+                };
+                ajaxHelper.delete(vm.apiUrl + '/' + item.customerId, null, callback);
+            },
+            updateCustomer: function () {
+                var vm = this;
+                var callback = function () {
+                    vm.getCustomers();
+                };
+                ajaxHelper.put(vm.apiUrl + '/' + vm.item.customerId, vm.item, callback);
+            },
+            loadCustomer: function (customerId) {
+                var vm = this;
+                this.gridData.forEach(function (item) {
+                    if(item.customerId === customerId){
+                        vm.$set('item', item);
+                    }
+                    return;
+                })
+                this.show = true;
+            }
+        }
+    });
+    
+    demo.$watch('show', function (newVal, oldVal) {
+        if(!newVal){
+            var vm = this;
+            vm.$set('item', {});
+        }
+    })
+
+</script>
+</html>
