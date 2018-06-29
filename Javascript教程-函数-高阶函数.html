@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--
+  ~ All rights Reserved, Designed By DataDriver
+  ~ Copyright:    DataDriver.Inc
+  ~ Company:      Zhuo Wo Infomation Technology (ShangHai) CO.LTD
+  -->
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+
+</body>
+<script>
+    /**
+     * 高阶函数英文叫Higher-order function。那么什么是高阶函数?
+     * Javascript的函数其实都指向某个变量。
+     * 既然变量可以指向函数，函数的参数能接收变量，那么一个函数就可以接收另一个函数作为参数，这种函数就成为高阶函数
+     */
+
+    function sum(arr) {
+        return arr.reduce(function (x, y) {
+            return x + y;
+        });
+    }
+
+</script>
+</html>
