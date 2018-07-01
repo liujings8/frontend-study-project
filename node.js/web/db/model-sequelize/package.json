@@ -1,0 +1,19 @@
+{
+    "name": "model-sequelize",
+    "version": "1.0.0",
+    "description": "Sequelize best practice example with async",
+    "main": "app.js",
+    "scripts": {
+        "start": "node --use_script app.js"
+    },
+    "keywords": [
+        "sequelize",
+        "async"
+    ],
+    "author": "phantom liu",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "sequelize": "3.24.1",
+        "mysql": "2.11.1"
+    }
+}

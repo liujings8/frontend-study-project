@@ -1,0 +1,20 @@
+{
+    "name": "url-koa",
+    "version": "1.0.0",
+    "description": "Koa2 example with url router",
+    "main": "app.js",
+    "scripts": {
+        "start": "node --use_script app.js"
+    },
+    "keywords": [
+        "koa",
+        "async"
+    ],
+    "author": "phantom liu",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "koa": "2.0.0",
+        "koa-bodyparser": "3.2.0",
+        "koa-router": "7.0.0"
+    }
+}

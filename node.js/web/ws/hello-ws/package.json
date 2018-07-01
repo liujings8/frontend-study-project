@@ -1,0 +1,18 @@
+{
+    "name": "hello-ws",
+    "version": "1.0.0",
+    "description": "Hello WebSocket example",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "keywords": [
+        "ws",
+        "websocket"
+    ],
+    "author": "Phantom Liu",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "ws": "1.1.1"
+    }
+}

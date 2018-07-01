@@ -1,0 +1,3 @@
+POSIX Portable Operating System Interface of UNIX 可移植操作系统系统接口
+
+wrapper n.封装

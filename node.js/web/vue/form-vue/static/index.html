@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="learn javascript by phantom">
+    <title>Vue</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <!--
+       要注意的是，在<head>内部编写的Javascript代码,需要用JQuery把MVVM的浏览器加载，初始化代码推迟到页面加载完毕后执行，
+        否则，直接在<head>内执行MVVM代码时，DOM节点尚未被浏览器加载，初始化将失败。
+    -->
+    <script src="/static/js/jquery-3.2.1.js"></script>
+    <script src="/static/js/vue.js"></script>
+    <script>
+        $(function () {
+            var vm = new Vue({
+                el: '#vm',
+                data: {
+                    email: '',
+                    password: '',
+                    birth: '',
+                    gender: '',
+                    language: ['zh'],
+                    city: 'bj',
+                    introduction: '',
+                    subscribe: true
+                },
+                methods: {
+                    register: function () {
+                        //http://www.runoob.com/js/javascript-json-stringify.html
+                        //使用四个空格缩进
+                        $('#modal-data').text(JSON.stringify(this.$data, null, '    '));
+                        //http://www.runoob.com/bootstrap/bootstrap-v2-modal-plugin.html
+                        $('#modal').modal();
+                        // TODO: post JSON data to server...
+                    }
+                }
+            });
+            /*
+            * 如果打开浏览器console,因为我们用代码windows.vm = vm, 把VM变量绑定到Windows对象上，所以可以直接修改VM的Model
+            * */
+            window.vm = vm;
+        });
+
+        function executeJs() {
+            try {
+                var code = $('#code').val();
+                var fn = new Function('var vm = window.vm;\n' + code);
+                fn();
+            } catch (e) {
+                return false;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="modal" id="modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!--
+                        data-dismiss是一个定制的HTML5 data属性。用于关闭模态窗口
+                    -->
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">Handle Register Form</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Post JSON data:</p>
+                    <pre id="modal-data"></pre>// pre用于格式化输出
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="navbar navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="/" class="navbar-brand">Learn JavaScript</a>
+            </div>
+            <nav class="collapse navbar-collapse" id="bs-navbar">
+                <ul class="nav navbar-nav">
+                    <li><a target="_blank" href="http://www.liaoxuefeng.com">Get Cources</a></li>
+                    <li><a target="_blank" href="http://www.liaoxuefeng.com">Get Cources</a></li>
+                    <li><a target="_blank" href="http://www.liaoxuefeng.com">Get Cources</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div id="important" style="color: #cdbfe3;background-color: #6f5499; padding: 30px 0;margin: -20px 0 20px 0;">
+        <div class="container">
+            <h1 style="color:#fff; font-size: 60px">Getting started</h1>
+            <p style="font-size:24px;line-height: 48px">Learn Javascript,Node.js,npm</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><span class="glyphicon glyphicon-th-list"></span> MVVM</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="vm">
+                            <h3>Register Vue Course</h3>
+                            <!--
+                                评论：
+                                1、prevent是preventDefault，阻止标签默认行为，有些标签有默认行为,例如a标签的跳转链接属性href属性等。
+                                2、submit点击默认行为是提交表单，这里并不需要提交表单，只需要执行register方法，故阻止为妙。
+                                3、stop是stopPropagation，阻止事件冒泡，点击那个元素，就执行这个元素，父级元素就不会响应了。
+                            -->
+                            <!--
+                                .prevent表示阻止事件冒泡，这样，浏览器不在处理<form>的submit事件。
+                            -->
+                            <form name="register" action="#" v-on:submit.prevent="register">
+                                <div class="form-group">
+                                    <label>Email address:</label>
+                                    <input type="email" v-model="email" class="from-control" placeholder="Enter email">
+                                </div>
+                                <div class="form-group">
+                                    <label>Password:</label>
+                                    <input type="password" v-model="birth" class="from-control" placeholder="Password">
+                                </div>
+                                <div class="form-group">
+                                    <label>Birth:</label>
+                                    <input type="date" v-model="date" class="from-control" placeholder="Birth">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender:</label>
+                                     <div class="radio">
+                                         <label><input type="radio" v-model="gender" value="m"> Male</label>
+                                     </div>
+                                    <div class="radio">
+                                        <label><input type="radio" v-model="gender" value="f"> Female</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label><input type="radio" v-model="gender" value="s"> Keep Secret</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Language:</label>
+                                    <div>
+                                        <label class="checkbox-inline"><input type="checkbox" v-model="language" value="zh"> Chinese</label>
+                                        <label class="checkbox-inline"><input type="checkbox" v-model="language" value="en"> English</label>
+                                        <label class="checkbox-inline"><input type="checkbox" v-model="language" value="fr"> French</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>City:</label>
+                                    <select v-model="city" class="form-group">
+                                        <option value="bj">Beijing</option>
+                                        <option value="sh">Shanghai</option>
+                                        <option value="gz">Guangzhou</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Introduce Yourself:</label>
+                                    <textarea v-model="introduction" class="form-control"
+                                              rows="3" style="resize: none;" placeholder="Your backgroud,interests, etc.">
+                                    </textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Subscribe:</label>
+                                    <div>
+                                        <label class="checkbox-inline"><input type="checkbox" v-model="subscribe"> Send me information of news course</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Register</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><span class="glyphicon glyphicon-eye-open"></span> Code</h3>
+                    </div>
+                    <div class="panel-body">
+                        <h3>Try change the model</h3>
+                        <form action="#" onsubmit="return executeJs()">
+                            <textarea id="code" class="form-control"
+                                      style="font-family: Menlo, Monaco, Consolas, 'Courier New', monospace" rows="5">
+vm.email = bob@example.com;
+vm.birth = '1990-01-21';
+vm.gender = 'f';
+                            </textarea>
+                            <button class="btn btn-primary">Execute</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Get more courses...</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Javascript</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>full-stack Javascript course</p>
+                        <p><a target="_blank" href="baid.com">Read more</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Python</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>the lastest Python course</p>
+                        <p><a target="_blank" href="baid.com">Read more</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">git</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>A course about git version control</p>
+                        <p><a target="_blank" href="baid.com">Read more</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <footer style="background-color: #ddd; padding: 20px 0;">
+        <div class="container">
+            <p>
+                <a target="_blank" href="http://www.liaofeng.com">Website</a> -
+                <a target="_blank" href="http://www.liaofeng.com">Github</a> -
+                <a target="_blank" href="http://www.liaofeng.com">Weibo</a>
+            </p>
+            <p>This JavaScript course is created by
+                <a traget="_blank" href="http://weibo.com/liaoxufeng">@廖雪峰</a>.</p>
+            <p>Code license <a target="_blank" href="https://github.com/michaelliao/learn-javascript/blob/master/LICENSE">Apache</a>.
+            </p>
+        </div>
+    </footer>
+</body>
+
+</html>
