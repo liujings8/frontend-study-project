@@ -62,3 +62,7 @@ target/
 *.ipr
 *.DS_Store
 */.DS_Store
+node_modules
+*/.vscode
+
+
