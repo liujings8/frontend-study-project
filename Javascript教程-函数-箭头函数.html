@@ -49,18 +49,19 @@
     console.log(fn());
 
     // 可变参数：
-    (x, y, ...rest) => {
+    var fn = (x, y, ...rest) => {
         var i, sum = x + y;
-        for(i=0; i<reset.length; i++){
+        for(i=0; i<rest.length; i++){
             sum += rest[i];
         }
         return sum;
     }
+    console.log(fn(1, 2, 3, 4, 5, 6, 7, 8, 9));
 
     // 如果要返回一个对象，就要注意，如果是单表达式，这么写的话会报错：
     // SyntaxError
     var fn = x => {foo_1: x};
-    console.log(fn('phantomliu'));// undefined
+    // console.log(fn('phantomliu'));// undefined
     //因为和函数体的{ ... }有语法冲突，所以要改为：
     // ok:
     var fn = x => ({foo: x});
@@ -74,12 +75,15 @@
         birth: 1990,
         getAge: function(){
             var b = this.birth;
+            console.log(this.birth);
             var fn = function () {
+                // console.log(this.birth);// undefined
                 return new Date().getFullYear() - this.birth;// this 指向window或undefined
             };
             return fn();
         }
     };
+    // console.log(obj.getAge());// NaN
 
     // 现在，箭头函数完全修复了this的指向，this总是指向词法作用域，也就是外层调用者obj：
     var obj = {
@@ -90,6 +94,7 @@
             return fn();
         }
     };
+    console.log(obj.getAge());// 28
 
     /*
      * 如果使用箭头函数，以前的那种hack写法：
@@ -106,7 +111,13 @@
             return fn.call({birth: 2000}, year);
         }
     };
-    console.log(obj.getAge(2015));// 25
+    console.log(obj.getAge(2018));// 28
+    // 练习 请使用箭头函数简化排序时传入的函数
+    var arr = [10, 20, 1, 2];
+    arr.sort((x, y) => {
+        return x - y;
+    });
+    console.log(arr);
 
 </script>
 </html>
