@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="styles/demo.css"/>
+</head>
+<body>
+    <!--注意：在子组件中定义prop时，使用了camelCase命名法。
+        由于HTML特性不区分大小写，camelCase的prop用于特性时，
+        需要转为 kebab-case（短横线隔开）。
+        例如，在prop中定义的myName，在用作特性时需要转换为my-name。
+    -->
+    <!--   在父组件中使用子组件时，通过以下语法将数据传递给子组件：
+        <child-component v-bind:子组件prop="父组件数据属性"></child-component>
+    -->
+    <div id="app">
+        <my-component v-bind:my-name="name" v-bind:my-age="age"></my-component>
+    </div>
+
+    <template id="myComponent">
+        <table>
+            <tr>
+                <th colspan="2">
+                    子组件数据
+                </th>
+            </tr>
+            <tr>
+                <td>my name</td>
+                <td>{{ myName }}</td>
+            </tr>
+            <tr>
+                <td>my age</td>
+                <td>{{ myAge }}</td>
+            </tr>
+        </table>
+    </template>
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+    var vm=new Vue({
+        el : '#app',
+        data : {
+            name : 'phantomLiu',
+            age : '24'
+        },
+        /*为了便于理解，你可以将这个Vue实例看作my-component的父组件。
+         如果我们想使用父组件的数据，则必须先在子组件中定义props属性，
+         也就是props: ['myName', 'myAge']这行代码。*/
+        components : {
+            'my-component' : {
+                template : '#myComponent',
+                props : ['myName','myAge']
+            }
+        }
+    });
+
+
+
+</script>
+</html>

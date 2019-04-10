@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="styles/demo.css"/>
+</head>
+<body>
+    <!--注意：在子组件中定义prop时，使用了camelCase命名法。
+        由于HTML特性不区分大小写，camelCase的prop用于特性时，
+        需要转为 kebab-case（短横线隔开）。
+        例如，在prop中定义的myName，在用作特性时需要转换为my-name。
+    -->
+    <!--   在父组件中使用子组件时，通过以下语法将数据传递给子组件：
+        <child-component v-bind:子组件prop="父组件数据属性"></child-component>
+    -->
+    <div id="app">
+
+        <table>
+            <tr>
+                <th colspan="3">父组件数据</td>
+            </tr>
+            <tr>
+                <td>name</td>
+                <td>{{ name }}</td>
+                <td><input type="text" v-model="name" /></td>
+            </tr>
+            <tr>
+                <td>age</td>
+                <td>{{ age }}</td>
+                <td><input type="text" v-model="age" /></td>
+            </tr>
+        </table>
+
+        <!--可以使用.once显式地指定单次绑定，单次绑定在建立之后不会同步之后的变化，
+        这意味着即使父组件修改了数据，也不会传导给子组件。-->
+        <my-component v-bind:my-name.once="name" v-bind:my-age.once="age"></my-component>
+
+    </div>
+
+
+    <template id="myComponent">
+        <table>
+            <tr>
+                <th colspan="3">
+                    子组件数据
+                </th>
+            </tr>
+            <tr>
+                <td>my name</td>
+                <td>{{ myName }}</td>
+                <td><input type="text" v-model="myName" /></td>
+            </tr>
+            <tr>
+                <td>my age</td>
+                <td>{{ myAge }}</td>
+                <td><input type="text" v-model="myAge" /></td>
+            </tr>
+        </table>
+    </template>
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+    var vm=new Vue({
+        el : '#app',
+        data : {
+            name : 'phantomLiu',
+            age : '24'
+        },
+        /*为了便于理解，你可以将这个Vue实例看作my-component的父组件。
+         如果我们想使父组件的数据，则必须先在子组件中定义props属性，
+         也就是props: ['myName', 'myAge']这行代码。*/
+        components : {
+            'my-component' : {
+                template : '#myComponent',
+                props : ['myName','myAge']
+            }
+        }
+    });
+
+
+
+</script>
+</html>

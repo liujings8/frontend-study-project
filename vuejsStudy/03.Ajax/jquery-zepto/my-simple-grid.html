@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #grid-template{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <simple-grid v-bind:data-list="gridData" v-bind:columns="gridColumns"></simple-grid>
+        </div>
+    </div>
+
+    <template id="grid-template">
+        <table>
+            <thead>
+                <tr>
+                    <th v-for="col in columns">
+                        {{ col | capitalize}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(index,entry) in dataList">
+                    <td v-for="col in columns">
+                        {{ entry[col] }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+
+</body>
+<!--<script></script>不能写成<script/>不然数据显示不出来-->
+<script type="text/javascript" src="js/vue.js"></script>
+<script>
+
+    Vue.component('simple-grid', {
+        template: '#grid-template',
+        props: ['dataList', 'columns']
+    });
+
+    var demo = new Vue({
+        el: '#app',
+        data: {
+            gridColumns: ['name', 'age', 'sex'],
+            gridData: [{
+                name: 'bob',
+                age: 12,
+                sex: 'male'
+            }]
+        }
+    });
+</script>
+
+</html>

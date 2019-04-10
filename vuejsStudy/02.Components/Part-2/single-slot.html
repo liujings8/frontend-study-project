@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        .content {
+            margin : 30px auto;
+            max-width: 480px;
+            border : 1px solid #cccccc;
+        }
+
+        /*
+         * 由于IE不支持<template>标签，所以template标签中的内容在IE下会直接显示出来。
+         * 将模板设为隐藏即可解决这个问题，template标签各浏览器支持请参考：http://caniuse.com/#feat=template
+         */
+        #myComponent {
+              display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <my-component>
+            <h1>Hello Vue.js</h1>
+        </my-component>
+        <my-component>
+        </my-component>
+    </div>
+
+    <template id="myComponent">
+        <div class="content">
+            <h2>This is a componnet!</h2>
+            <slot>如果没有分发内容，则显示slot中的内容</slot>
+            <p>Say Something...</p>
+        </div>
+    </template>
+
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+
+    Vue.component('my-component',{
+        template : '#myComponent'
+    });
+
+    var vm=new Vue({
+        el : '#app'
+    });
+
+</script>
+</html>
