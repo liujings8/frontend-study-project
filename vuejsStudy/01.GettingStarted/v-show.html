@@ -5,26 +5,26 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<!--这是我们的View-->
-	<div id="app">
-		<h1>Hello,Vue.js!</h1>
-		<h1 v-show="yes">Yes!</h1>
-		<h1 v-show="no">No!</h1>
-		<h1 v-show="age>=25">Age:{{age}}</h1>
-		<h1 v-show="name.indexOf('jack')>=0">Name:{{name}}</h1>
-	</div>
+    <!--这是我们的View-->
+    <div id="app">
+        <h1>Hello,Vue.js!</h1>
+        <h1 v-show="yes">Yes!</h1>
+        <h1 v-show="no">No!</h1>
+        <h1 v-show="age>=25">Age:{{age}}</h1>
+        <h1 v-show="name.indexOf('jack')>=0">Name:{{name}}</h1>
+    </div>
 </body>
 <!-- <script src="http://static.runoob.com/assets/vue/1.0.11/vue.min.js"></script> -->
-<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/vue-1.js"></script>
 <script>
-	var vm=new Vue({
-		el : '#app',
-		data : {
-			yes : true,
-			no : false,
-			age : 28,
-			name : 'keepfool'
-		}
-	})
+    var vm=new Vue({
+        el : '#app',
+        data : {
+            yes : true,
+            no : false,
+            age : 28,
+            name : 'keepfool'
+        }
+    })
 </script>
 </html>

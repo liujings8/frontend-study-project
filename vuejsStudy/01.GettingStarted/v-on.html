@@ -5,35 +5,37 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<!--这是我们的View-->
-	<div id="app">
-		<p><input type="txt" v-model="message"></p>
-		<p>
-			<button v-on:click="greet">Greet</button>
-		</p>
-		<p>
-			<button v-on:click="say('Hi')">Hi</button>		
-		</p>
-	</div>
+    <!--这是我们的View-->
+    <div id="app">
+        <p><input type="txt" v-model="message"></p>
+        <p>
+            <!--click事件直接绑定一个方法-->
+            <button v-on:click="greet">Greet</button>
+        </p>
+        <p>
+            <!--click事件使用内联语句-->
+            <button v-on:click="say('Hi')">Hi</button>        
+        </p>
+    </div>
 </body>
 <!-- <script src="http://static.runoob.com/assets/vue/1.0.11/vue.min.js"></script> -->
-<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/vue-1.js"></script>
 <script>
-	var vm=new Vue({
-		el : '#app',
-		data : {
-			message : 'Hello,Vue.js!'
-		},
-		// 在'methods'对象中定义方法
-		methods : {
-			greet : function(){
-				// 方法内'this'指向vm
-				alert(this.message)
-			},
-			say : function(msg){
-				alert(msg)
-			}
-		}
-	})
+    var vm=new Vue({
+        el : '#app',
+        data : {
+            message : 'Hello,Vue.js!'
+        },
+        // 在'methods'对象中定义方法
+        methods : {
+            greet : function(){
+                // 方法内'this'指向vm
+                alert(this.message)
+            },
+            say : function(msg){
+                alert(msg)
+            }
+        }
+    })
 </script>
 </html>

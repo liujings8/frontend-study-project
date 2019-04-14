@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div id="help">
+        <loading v-show="showLoading"></loading>
+    </div>
+</body>
+<!--添加一个loading组件-->
+<template id="loading-template">
+    <div class="loading-overlay">
+        <div class="sk-three-bounce">
+            <div class="sk-child sk-bounce1"></div>
+            <div class="sk-child sk-bounce2"></div>
+            <div class="sk-child sk-bounce3"></div>
+        </div>
+    </div>
+</template>
+<script type="text/javascript" src="js/vue.js">
+</script>
+<script>
+    /*将loading组件作为另外一个Vue实例的子组件*/
+    var help = new Vue({
+        el: '#help',
+        data: {
+            showLoading: false
+        },
+        components: {
+            'loading': {
+                template: '#loading-template'
+            }
+        }
+    });
+
+    Vue.http.interceptors.push((request, next) => {
+        loading.show = true;
+        next((response) =>{
+            loading.show = false;
+            return response;
+        });
+    }
+
+</script>
+</html>

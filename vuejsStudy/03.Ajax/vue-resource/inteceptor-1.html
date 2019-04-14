@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<template id="grid-template">
+		<table>
+
+
+
+		</table>
+
+
+	</template>
+</body>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/vue-resource.js"></script>
+<script type="text/javascript">
+	Vue.component('simple-grid', {
+		template: '#grid-template',
+		props: ['dataList', 'columns', 'searchKey']
+	});
+
+	var demo = new Vue({
+		el: '#app',
+		data: {
+		    gridData: [],
+			gridColumns: [{
+		        name: 'customerId',
+				isKey: true
+			}, {
+		       	name: 'companyName'
+			}, {
+		        name: 'contactName'
+			}, {
+		        name: 'phone'
+			}]
+		}
+	});
+
+
+
+
+
+
+
+</script>
+</html>
