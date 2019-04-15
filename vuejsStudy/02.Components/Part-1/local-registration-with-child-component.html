@@ -5,33 +5,36 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<div id="app">
-		<parent-component></parent-component>
-	</div>
+    <div id="app">
+        <!-- 6.在页面中使用<parent-component>标签渲染Parent组件的内容，同时Child组件的内容也被渲染出来 -->
+        <parent-component></parent-component>
+        <child-component></child-component>
+    </div>
 </body>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript">
 
-	//	1.创建一个组件构造器
-	var Child = Vue.extend({
-		template : '<p>This is child component!</p>'
-	});
-	
-	var Parent = Vue.extend({
-		//	在Parent组件内使用<child-component>标签
-		template : '<p>This is parent component!</p><child-component></child-component>',
-		components : {
-			//	局部注册Child组件，该组件只能在Parent组件内使用
-			'child-component' : Child
-		}
-	});
-	
-	//	全局注册Parent组件
-	Vue.component('parent-component',Parent);
-	
-	new Vue({
-		el : '#app'
-	});
+    // 1.创建一个Child组件构造器
+    var Child = Vue.extend({
+        template : '<p>This is child component!</p>'
+    });
+
+    // 2.定义一个Parent组件构造器
+    var Parent = Vue.extend({
+        // 4.在Parent组件内以<child-component>标签的形式使用Child组件
+        template : '<p>This is parent component!</p><child-component></child-component>',
+        components : {
+            // 3.局部注册Child组件，该组件只能在Parent组件内使用，并将Child组件的标签设置为child-component
+            'child-component' : Child
+        }
+    });
+    
+    // 5.全局注册Parent组件
+    Vue.component('parent-component',Parent);
+    
+    new Vue({
+        el : '#app'
+    });
 
 </script>
 </html>

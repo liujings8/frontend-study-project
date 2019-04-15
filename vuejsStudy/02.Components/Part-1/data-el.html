@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
 </head>
 <body>
-	<div id="app">
-		<my-component></my-component>	
-	</div>
-	
-	<template id="myComponent">
-		<p>
-			<input type="text" v-model="a">{{ a }}			
-		</p>
-	</template>
-	
+<div id="app">
+    <my-component></my-component>
+</div>
+
+<template id="myComponent">
+    <p>
+        <input type="text" v-model="a">{{ a }}
+    </p>
+</template>
+
 </body>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript">
-	
-	Vue.component('my-component',{
-		template : '#myComponent',
-		data : function(){
-			return	{a : 1}
-		}
-	});
-	
-	new Vue({
-		el : '#app'
-	}); 
+
+    /* 在定义组件的选项时，data和el选项必须使用函数
+       如果data选项指向某个对象，这意味着所有的组件实例共用一个data。
+       我们应当使用一个函数作为 data 选项，让这个函数返回一个新对象：*/
+    Vue.component('my-component',{
+        template : '#myComponent',
+        data : function(){
+            return {a : 1}
+        }
+    });
+
+    new Vue({
+        el : '#app'
+    });
 
 </script>
 </html>

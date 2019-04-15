@@ -6,12 +6,12 @@
     <link rel="stylesheet" href="styles/demo.css"/>
 </head>
 <body>
-    <!--注意：在子组件中定义prop时，使用了camelCase命名法。
+    <!-- 注意：在子组件中定义prop时，使用了camelCase命名法。
         由于HTML特性不区分大小写，camelCase的prop用于特性时，
         需要转为 kebab-case（短横线隔开）。
         例如，在prop中定义的myName，在用作特性时需要转换为my-name。
     -->
-    <!--   在父组件中使用子组件时，通过以下语法将数据传递给子组件：
+    <!-- 在父组件中使用子组件时，通过以下语法将数据传递给子组件：
         <child-component v-bind:子组件prop="父组件数据属性"></child-component>
     -->
     <div id="app">
@@ -21,9 +21,7 @@
     <template id="myComponent">
         <table>
             <tr>
-                <th colspan="2">
-                    子组件数据
-                </th>
+                <th colspan="2">子组件数据</th>
             </tr>
             <tr>
                 <td>my name</td>

@@ -37,12 +37,16 @@
 </body>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript">
+    // 父组件传递过来的data和columns必须是Array类型，filterKey必须是字符串类型
     Vue.component('simple-grid',{
         template : '#grid-template',
-            props : ['data','columns','filterKey']
+            props : {
+                data: Array,
+                columns: Array,
+                filterKey: String
+            }
     });
-</script>
-<script type="text/javascript">
+
     new Vue({
         el : '#app',
         data : {

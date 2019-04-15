@@ -5,40 +5,40 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<div id="app1">
-		<my-component1></my-component1>
-	</div>
-	<div id="app2">
-		<my-component1></my-component1>
-		<my-component2></my-component2>
-		<my-component3></my-component3>
-	</div>
+    <div id="app1">
+        <my-component1></my-component1>
+    </div>
+    <div id="app2">
+        <my-component1></my-component1>
+        <my-component2></my-component2>
+        <my-component3></my-component3>
+    </div>
 </body>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript">
 
-	//	全局注册，my-component1是标签名称
-	Vue.component('my-component1',{
-		template : '<div>This is my first component!</div>'
-	});
-	
-	var vm1 = new Vue({
-		el : '#app1'
-	});
-	
-	var vm2 = new Vue({
-		el : '#app2',
-		components : {
-			//	局部注册，my-component2是标签名称
-			'my-component2' : {
-				template : '<div>This is the second component!</div>'
-			},
-			//	局部注册，my-component3是标签名称
-			'my-component3' : {
-				template : '<div>This is the third component!</div>'
-			}
-		}
-	});
+    // 全局注册，my-component1是标签名称
+    Vue.component('my-component1',{
+        template : '<div>This is my first component!</div>'
+    });
+    
+    var vm1 = new Vue({
+        el : '#app1'
+    });
+    
+    var vm2 = new Vue({
+        el : '#app2',
+        components : {
+            // 局部注册，my-component2是标签名称
+            'my-component2' : {
+                template : '<div>This is the second component!</div>'
+            },
+            // 局部注册，my-component3是标签名称
+            'my-component3' : {
+                template : '<div>This is the third component!</div>'
+            }
+        }
+    });
 
 </script>
 </html>

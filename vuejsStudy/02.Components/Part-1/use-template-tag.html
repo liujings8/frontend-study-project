@@ -1,35 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
 </head>
 <body>
-	<div id="app">
-		<my-component></my-component>	
-	</div>
-	
-	<template id="myComponent">
-		<div>"This is a componnent!"></div>
-	</template>
-	
+    <div id="app">
+        <my-component></my-component>
+    </div>
+
+    <!-- 如果使用<template>标签，则不需要指定type属性。 -->
+    <template id="myComponent">
+        <div>"This is a componnent!"></div>
+    </template>
+
 </body>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript">
-	
-	/* template选项现在不再是HTML元素，而是一个id，
-		Vue.js根据这个id查找对应的元素，
-		然后将这个元素内的HTML作为模板进行编译。 */
-	/* 注意：使用<script>标签时，type指定为text/x-template，
-		意在告诉浏览器这不是一段js脚本，
-		浏览器在解析HTML文档时会忽略<script>标签内定义的内容。 */
-	Vue.component('my-component',{
-		template : '#myComponent'
-	});
-	
-	new Vue({
-		el : '#app'
-	}); 
+    /* 在理解了组件的创建和注册过程后，我建议使用<script>或<template>标签来定义组件的HTML模板。
+       这使得HTML代码和JavaScript代码是分离的，便于阅读和维护 */
+    Vue.component('my-component',{
+        template : '#myComponent'
+    });
+
+    new Vue({
+        el : '#app'
+    });
 
 </script>
 </html>

@@ -24,7 +24,7 @@
              <input type="text" class="search-input" v-model="searchQuery">
         </div>
         <div class="container">
-            <!--    使用了v-bind指令的缩写。 -->
+            <!-- 使用了v-bind指令的缩写。 -->
             <simple-grid :data-list="people" :columns="columns" :search-key="searchQuery"></simple-grid>
         </div>
     </div>
@@ -34,7 +34,7 @@
             <thead>
                 <tr>
                     <th v-for="col in columns">
-                        <!--    使用了capitalize过滤器，将字符串的首字母转换为大写后输出。  -->
+                        <!-- 使用了capitalize过滤器，将字符串的首字母转换为大写后输出。 -->
                         {{ col.name | capitalize }}
                     </th>
                     <th>
@@ -43,7 +43,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!--    使用了filterBy过滤器，根据指定条件过滤数组元素，filterBy返回过滤后的数组。   -->
+                <!-- 使用了filterBy过滤器，根据指定条件过滤数组元素，filterBy返回过滤后的数组。 -->
                 <tr v-for="(index,entry) in dataList | filterBy searchKey">
                     <td v-for="col in columns">
                         {{ entry[col.name] }}
@@ -104,7 +104,6 @@
             }]
         }
     });
-
 
 </script>
 </html>
