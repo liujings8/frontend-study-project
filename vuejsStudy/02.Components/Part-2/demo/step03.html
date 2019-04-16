@@ -52,7 +52,7 @@
                     </td>
                     <td class="text-center">
                         <!--    使用了v-on指令的缩写，@click是v-on:click的缩写。  -->
-                        <button @click="deleteItem(index)">delete</button>
+                        <button class="btn-danger" @click="deleteItem(index)">delete</button>
                     </td>
                 </tr>
             </tbody>
@@ -60,7 +60,7 @@
         <div class="container">
             <button @click="openNewItemDialog('Create New item')">Create</button>
         </div>
-        <!--    在<modal-dialog>标签上给sample-grid绑定一个自定义事件create-item，后面在$dispatch派发事件时会用到。    -->
+        <!-- 由于保存按钮是在子组件modal-dialog中，在<modal-dialog>标签上给sample-grid绑定一个自定义事件create-item，后面在$dispatch派发事件时会用到。-->
 
         <!--create-item是一个自定义事件，
             由子组件modal-dialog调用this.$dispatch('create-item') 派发到自定义事件create-item，
@@ -167,13 +167,13 @@
                         this.show = false;
                     },
                     save : function () {
-                       //   新建模式
+                       // 新建模式
                         if(this.mode === 1){
                             /*  由于保存按钮是在子组件modal-dialog中的，
                                 而createItem方法是在父组件simple-grid中的，
                                 所以这里使用this.$dispatch('create-item') 派发到父组件的自定义事件create-item。
                             */
-                            //使用$dispatch调用simple-grid的create-item方法
+                            // 使用$dispatch调用simple-grid的create-item方法
                             this.$dispatch('create-item');
                         }
                     }
@@ -189,7 +189,7 @@
         }
     });
 
-    var demo=new Vue({
+    var demo = new Vue({
         el : '#app',
         data : {
             searchQuery : '',

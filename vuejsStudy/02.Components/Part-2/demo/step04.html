@@ -54,10 +54,11 @@
                                 {{ entry[col.name] }}
                             </a>
                         </span>
+                        <span v-else="col.isKey">{{ entry[col.name] }}</span>
                     </td>
                     <td class="text-center">
                         <!--    使用了v-on指令的缩写，@click是v-on:click的缩写。  -->
-                        <button @click="deleteItem(entry)">delete</button>
+                        <button class="btn-danger" @click="deleteItem(entry)">delete</button>
                     </td>
                 </tr>
             </tbody>
@@ -153,13 +154,13 @@
                 this.$broadcast('showDialog',true);
             },
             openEditItemDialog : function (key,title) {
-                alert(key);
+                // alert(key);
                 //根据主键查找当前修改的数据
                 var currentItem = this.findItemByKey(key);
                 //对话框的标题
                 this.title = title;
                 //mode=2表示修改模式
-                this.model = 2;
+                this.mode = 2;
                 //初始化this.item
                 this.item = {};
                 //将选中的数据拷贝到this.item

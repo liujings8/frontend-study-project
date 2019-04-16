@@ -55,10 +55,11 @@
                                 {{ entry[col.name] }}
                             </a>
                         </span>
+                        <span v-else="col.isKey">{{ entry[col.name] }}</span>
                     </td>
                     <td class="text-center">
                         <!--    使用了v-on指令的缩写，@click是v-on:click的缩写。  -->
-                        <button @click="deleteItem(entry)">delete</button>
+                        <button class="btn-danger" @click="deleteItem(entry)">delete</button>
                     </td>
                 </tr>
             </tbody>
@@ -133,7 +134,7 @@
             for(var i=0;i<this.columns.length;i++){
                 if(this.columns[i].isKey){
                     this.keyColumn = this.columns[i]['name'];
-                    //alert(this.keyColumn);
+                    // alert(this.keyColumn);
                     break;
                 }
             }
@@ -154,13 +155,13 @@
                 this.$broadcast('showDialog',true);
             },
             openEditItemDialog : function (key,title) {
-                alert(key);
+                // alert(key);
                 //根据主键查找当前修改的数据
                 var currentItem = this.findItemByKey(key);
                 //对话框的标题
                 this.title = title;
                 //mode=2表示修改模式
-                this.model = 2;
+                this.mode = 2;
                 //初始化this.item
                 this.item = {};
                 //将选中的数据拷贝到this.item
@@ -186,7 +187,7 @@
 
             },
             itemExists : function (keyColumn) {
-                alert(keyColumn);
+                // alert(keyColumn);
                 for(var i=0;i<this.dataList.length;i++){
                     if(this.item[keyColumn] === this.dataList[i][keyColumn]){
                         return true;
@@ -235,7 +236,7 @@
                 var keyColumn = this.keyColumn;
                 for(var i=0;i<this.dataList.length;i++){
                     //根据主键查找要修改的数据，然后将this.item数据更新到this.dataList[i]
-                    if(this.dataList[i][keyColumn] ===this.item[keyColumn]){
+                    if(this.dataList[i][keyColumn] === this.item[keyColumn]){
                         for(var j in this.item){
                             this.dataList[i][j] = this.item[j]
                         }
@@ -295,7 +296,7 @@
         }
     });
 
-    var demo=new Vue({
+    var demo = new Vue({
         el : '#app',
         data : {
             searchQuery : '',

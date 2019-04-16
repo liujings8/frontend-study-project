@@ -9,7 +9,8 @@
          * 由于IE不支持<template>标签，所以template标签中的内容在IE下会直接显示出来。
          * 将模板设为隐藏即可解决这个问题，template标签各浏览器支持请参考：http://caniuse.com/#feat=template
          */
-        #grid-template{
+        #grid-template,
+        #dialog-template{
             display : none;
         }
     </style>
@@ -21,11 +22,13 @@
 <body>
     <div id="app">
         <div class="container">
-            <label>Search</label>
-             <input type="text" class="search-input" v-model="searchQuery">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="text" class="search-input" v-model="searchQuery">
+            </div>
         </div>
         <div class="container">
-            <!--    使用了v-bind指令的缩写。 -->
+            <!-- 使用了v-bind指令的缩写。 -->
             <simple-grid :data-list="people" :columns="columns" :search-key="searchQuery"></simple-grid>
         </div>
     </div>
@@ -44,21 +47,18 @@
                 </tr>
             </thead>
             <tbody>
-                <!--    使用了filterBy过滤器，根据指定条件过滤数组元素，filterBy返回过滤后的数组。   -->
+                <!-- 使用了filterBy过滤器，根据指定条件过滤数组元素，filterBy返回过滤后的数组。-->
                 <tr v-for="(index,entry) in dataList | filterBy searchKey">
                     <td v-for="col in columns">
                         {{ entry[col.name] }}
                     </td>
                     <td class="text-center">
-                        <!--    使用了v-on指令的缩写，@click是v-on:click的缩写。  -->
-                        <button @click="deleteItem(index)">delete</button>
+                        <!-- 使用了v-on指令的缩写，@click是v-on:click的缩写。-->
+                        <button class="btn-danger" @click="deleteItem(index)">delete</button>
                     </td>
                 </tr>
             </tbody>
         </table>
-        <div class="container">
-            <button class="btn" @click="openNewItemDialog('Create New item')">Create</button>
-        </div>
         <modal-dialog :mode="mode" :title="title" :fields="columns" :item="item">
         </modal-dialog>
     </template>
@@ -108,7 +108,9 @@
                 this.dataList.splice(index,1);
             }
         },
-        /*  modal-dialog组件在simple-grid组件中注册：    */
+        /* 由于对话框的内容来源于具体的数据，所以我们可以考虑将对话框作为simple-grid组件的一个子组件 */
+        /* modal-dialog组件没有使用Vue.component进行全局注册，使用simple-grid组件components选项实现了局部注册 */
+        /* modal-dialog组件在simple-grid组件中注册：  */
         components : {
             'modal-dialog' : {
                 template : '#dialog-template',
