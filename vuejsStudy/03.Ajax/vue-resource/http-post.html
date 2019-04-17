@@ -10,8 +10,7 @@
 <body>
 <div id="app">
     <div class="container">
-        <simple-grid :data-list="gridData" :columns="gridColumns">
-        </simple-grid>
+        <simple-grid :data-list="gridData" :columns="gridColumns"></simple-grid>
     </div>
     <div class="container">
         <div class="form-group">
@@ -56,9 +55,7 @@
         </thead>
         <tbody>
         <tr v-for="(index,entry) in dataList">
-            <td v-for="col in columns">
-                {{ entry[col.name] }}
-            </td>
+            <td v-for="col in columns">{{ entry[col.name] }}</td>
         </tr>
         </tbody>
     </table>
@@ -113,7 +110,7 @@
                 name: 'phone'
             }],
             gridData: [],
-            apiUrl: 'http://211.149.193.19:8080/api/customers',
+            apiUrl: 'http://localhost:8080/api/customers',
             item: {}
         },
         ready: function () {
@@ -126,8 +123,8 @@
             getCustomers: function () {
                 var vm = this;
                 vm.$http.get(this.apiUrl)
-                    .then((response) => {
-                    this.$set('gridData', response.data);
+                .then((response) => {
+                    this.$set('gridData', JSON.parse(response.body));
                 });
             },
             createCustomer: function () {

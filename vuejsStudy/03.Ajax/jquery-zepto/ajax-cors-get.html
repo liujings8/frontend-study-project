@@ -52,18 +52,26 @@
         data: {
             gridColumns: ['customerId', 'companyName', 'contactName', 'phone'],
             gridData: [],
-            apiUrl: 'http://211.149.193.19:8080/api/customers'
+            apiUrl: 'http://localhost:8080/api/customers'
         },
         ready : function () {
             this.getCustomers();
         },
         methods: {
             getCustomers: function () {
+                // 定义vm变量，让它指向this，this是当前的Vue实例
                 var vm = this;
                 var callback = function (data) {
+                    // 由于函数作用域，这里不能使用this
                     vm.$set('gridData',data);
                 };
                 /*出现过ajaxHelper未定义*/
+                /*
+                * 由于客户端和服务端Web Api是分属于不同站点的，它们是不同的源，这构成了跨域请求
+                * 这时请求是失败的，浏览器会提示一个错误
+                * Failed to load http://localhost:8080/api/customers: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+                * Origin 'http://localhost:63342' is therefore not allowed access.
+                * */
                 ajaxHelper.get(vm.apiUrl,null,callback);
             }
         }

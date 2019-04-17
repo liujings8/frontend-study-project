@@ -7,56 +7,56 @@
     <link rel="stylesheet" href="fonts/iconfont.css"></link>
 </head>
 <body>
-    <div id="app">
-        <div class="container">
-            <div class="form-group">
-                <button @click="this.show = true">Create</button>
-            </div>
+<div id="app">
+    <div class="container">
+        <div class="form-group">
+            <button @click="this.show = true">Create</button>
         </div>
-        <modal-dialog v-bind:show.sync="show">
-            <header class="dialog-header" slot="header">
-                <h1 class="dialog-title">Create New Customer</h1>
-            </header>
-            <div class="dialog-body" slot="body">
-                <div class="form-group" v-show="item.customerId">
-                    <label>Customer Id</label>
-                    <input type="text" v-model="item.customerId" />
-                </div>
-                <div class="form-group">
-                    <label>Customer Name</label>
-                    <input type="text" v-model="item.customerName" />
-                </div>
-                <div class="form-group">
-                    <label>Company Name</label>
-                    <input type="text" v-model="item.companyName" />
-                </div>
-                <div class="form-group">
-                    <label></label>
-                    <button @click="createCustomer">Save</button>
-                </div>
-            </div>
-        </modal-dialog>
     </div>
-
-    <template id="dialog-tempalte">
-        <div class="dialogs">
-            <div class="dialog" v-bind:class="{ 'dialog-active': show}">
-                <div class="dialog-content">
-                    <div class="close roate">
-                        <span class="iconfont icon-close"></span>
-                    </div>
-                    <slot name="header"></slot>
-                    <slot name="body"></slot>
-                    <slot name="footer"></slot>
-                </div>
+    <modal-dialog v-bind:show.sync="show">
+        <header class="dialog-header" slot="header">
+            <h1 class="dialog-title">Create New Customer</h1>
+        </header>
+        <div class="dialog-body" slot="body">
+            <div class="form-group">
+                <label>Customer Id</label>
+                <input type="text"/>
             </div>
-            <div class="dialog-overlay"></div>
+            <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text"/>
+            </div>
+            <div class="form-group">
+                <label>Company Name</label>
+                <input type="text"/>
+            </div>
+            <div class="form-group">
+                <label></label>
+                <button @click="save">Save</button>
+            </div>
         </div>
-    </template>
+    </modal-dialog>
+</div>
+
+<template id="dialog-template">
+    <div class="dialogs">
+        <div class="dialog" v-bind:class="{ 'dialog-active': show}">
+            <div class="dialog-content">
+                <div class="close rotate">
+                    <span class="iconfont icon-close" @click="this.show = false"></span>
+                </div>
+                <slot name="header"></slot>
+                <slot name="body"></slot>
+                <slot name="footer"></slot>
+            </div>
+        </div>
+        <div class="dialog-overlay"></div>
+    </div>
+</template>
 </body>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript">
-    Vue.component('modal-dialog',{
+    Vue.component('modal-dialog', {
         template: '#dialog-template',
         props: ['show'],
         methods: {
@@ -67,7 +67,15 @@
     });
 
     var demo = new Vue({
-        
+        el: "#app",
+        data: {
+            show: false
+        },
+        methods : {
+            save : function () {
+                this.show = false;
+            }
+        }
     });
 
 </script>

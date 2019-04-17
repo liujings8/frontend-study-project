@@ -10,9 +10,7 @@
 <body>
 <div id="app">
     <div class="container">
-        <simple-grid :data-list="gridData" :columns="gridColumns"
-        	v-on:load-entry="loadCustomer">
-        </simple-grid>
+        <simple-grid :data-list="gridData" :columns="gridColumns" @load-entry="loadCustomer"></simple-grid>
     </div>
     <div class="container">
         <div class="form-group">
@@ -123,7 +121,7 @@
                 name: 'phone'
             }],
             gridData: [],
-            apiUrl: 'http://211.149.193.19:8080/api/customers',
+            apiUrl: 'http://localhost:8080/api/customers',
             item: {}
         },
         ready: function () {
@@ -151,7 +149,7 @@
                 var vm = this;
                 vm.$http.get(vm.apiUrl)
                     .then((response) => {
-                    vm.$set('gridData', response.data);
+                    vm.$set('gridData', JSON.parse(response.data));
                 });
             },
             createCustomer: function () {
@@ -167,12 +165,20 @@
             updateCustomer: function () {
                 var vm = this;
                 vm.$http.put(vm.apiUrl+'/'+vm.item.customerId,vm.item)
-                    .then((response) => {
+                .then((response) => {
+                    vm.$set('item', {});
                     vm.getCustomers();
                 })
             }
         }
     });
+
+    /* 作用是每次show一次就清空一次 */
+    demo.$watch('show', function(newVal, oldVal) {
+        if (!newVal) {
+            this.item = {}
+        }
+    })
 
 </script>
 </html>

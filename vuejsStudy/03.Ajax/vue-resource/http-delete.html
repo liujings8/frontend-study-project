@@ -10,10 +10,7 @@
 <body>
 <div id="app">
     <div class="container">
-        <simple-grid :data-list="gridData" :columns="gridColumns"
-        	v-on:load-entry="loadCustomer"
-        	v-on:delete-entry="deleteCustomer">
-        </simple-grid>
+        <simple-grid :data-list="gridData" :columns="gridColumns" @load-entry="loadCustomer" @delete-entry="deleteCustomer"></simple-grid>
     </div>
     <div class="container">
         <div class="form-group">
@@ -131,7 +128,7 @@
                 name : 'phone'
             }],
             gridData : [],
-            apiUrl : 'http://211.149.193.19:8080/api/customers',
+            apiUrl : 'http://localhost:8080/api/customers',
             item : {}
         },
         ready: function () {
@@ -158,8 +155,8 @@
             getCustomers: function () {
                 var vm = this;
                 vm.$http.get(this.apiUrl)
-                    .then((response) => {
-                    this.$set('gridData', response.data);
+                .then((response) => {
+                    this.$set('gridData', JSON.parse(response.body));
                 });
             },
             createCustomer: function () {

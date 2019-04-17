@@ -8,8 +8,7 @@
 <body>
 	<div id="app">
 		<div class="container">
-			<simple-grid :data-list="gridData" :columns="gridColumns">
-			</simple-grid>
+			<simple-grid :data-list="gridData" :columns="gridColumns"></simple-grid>
 		</div>
 	</div>
 	
@@ -43,16 +42,26 @@
 		data: {
 			gridColumns: ['customerId','companyName','contactName','phone'],
 			gridData: [],
-			apiUrl: 'http://211.149.193.19:8080/api/customers'
+			apiUrl: 'http://localhost:8080/api/customers'
 		},
 		ready : function(){
-			this.getCustomers()
+			this.getCustomers();
 		},
 		methods : {
 			getCustomers : function(){
+				/**
+				 * 这段程序只提供了successCallback，而省略了errorCallback。
+				 * catch方法用于捕捉程序的异常，catch方法和errorCallback是不同的，
+				 * errorCallback只在响应失败时调用，而catch则是在整个请求到响应过程中，
+				 * 只要程序出错了就会被调用
+				 */
+				/**
+				 * 在then方法的回调函数内，你也可以直接使用this，this仍然是指向Vue实例的
+				 * 为了减少作用域链的搜索，建议使用一个局部变量来接收this
+				 */
 				this.$http.get(this.apiUrl)
-					.then((response)=>{
-						this.$set('gridData',response.data);
+					.then((response) => {
+						this.$set('gridData',JSON.parse(response.body));
 					})
 					.catch(function(response){
 						console.log(response)

@@ -73,7 +73,7 @@
                         </span>
                         <span v-else>{{ entry[col.name] }}</span>
                     </td>
-                    <td><button @click="deleteEntry(entry)">delete</button></td>
+                    <td><button class="btn-danger" @click="deleteEntry(entry)">delete</button></td>
                 </tr>
             </tbody>
         </table>
@@ -142,7 +142,7 @@
             },{
                 name: 'phone'
             }],
-            apiUrl: 'http://211.149.193.19:8080/api/customers'
+            apiUrl: 'http://localhost:8080/api/customers'
         },
         ready: function () {
             this.getCustomers();

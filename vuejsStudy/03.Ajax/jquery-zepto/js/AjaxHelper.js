@@ -1,13 +1,13 @@
 /**
  * Created by phantom on 2017/5/9.
  */
-/*
-*
-* 基于$.ajax声明一个简单的AjaxHelper构造器，
-* AjaxHelper构造器的原型对象包含5个方法，
-* 分别用于处理GET, POST, PUT, DELETE和JSONP请求。
-*
-* */
+/**
+ *
+ * 基于$.ajax声明一个简单的AjaxHelper构造器，
+ * AjaxHelper构造器的原型对象包含5个方法，
+ * 分别用于处理GET, POST, PUT, DELETE和JSONP请求。
+ *
+ */
 function AjaxHelper() {
     this.ajax = function (url, type, dataType, data, callback) {
         $.ajax({

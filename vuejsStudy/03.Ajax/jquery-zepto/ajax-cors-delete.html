@@ -11,7 +11,8 @@
 <body>
     <div id="app">
         <div class="container">
-            <simple-grid :data-list="gridData" :columns="gridColumns"></simple-grid>
+            <!-- : v-bind  @ v-on -->
+            <simple-grid :data-list="gridData" :columns="gridColumns" @load-entry="loadCustomer" @delete-entry="deleteCustomer"></simple-grid>
         </div>
         <div class="container">
             <div class="form-group">
@@ -20,7 +21,10 @@
         </div>
         <modal-dialog v-bind:show.sync="show">
             <header class="dialog-header" slot="header">
-                <h1 class="dialog-title">Create New Customer</h1>
+                <!-- 由于在新建模式和修改模式下标题内容是不同的，因此需要修改modal-dialog的slot="header"部分。
+                    根据item.customerId是否有值确定修改模式和新建模式
+                -->
+                <h1 class="dialog-title">{{ item.customerId ? 'Edit Customer - ' + item.contactName : 'Create New Customer' }}</h1>
             </header>
             <div class="dialog-body" slot="body">
                 <!-- 在新建Customer时，由于item.customerId为空(v-show会判断true/false)，所以item.customerId关联的表单不会显示；
@@ -44,7 +48,7 @@
                 </div>
                 <div class="form-group">
                     <label></label>
-                    <button @click="createCustomer">Save</button>
+                    <button @click="saveCustomer">Save</button>
                 </div>
             </div>
         </modal-dialog>
@@ -57,12 +61,18 @@
                     <th v-for="col in columns">
                         {{ col.name | capitalize }}
                     </th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="(index,entry) in dataList">
                     <td v-for="col in columns">
-                        {{ entry[col.name] }}
+                        <span v-if="col.isKey"><a href="javascript:void(0)" @click="loadEntry(entry[col.name])">{{ entry[col.name] }}</a></span>
+                        <span v-else>{{ entry[col.name] }}</span>
+                    </td>
+                    <td class="text-center">
+                        <!--    使用了v-on指令的缩写，@click是v-on:click的缩写。  -->
+                        <button class="btn-danger" @click="deleteEntry(entry)">delete</button>
                     </td>
                 </tr>
             </tbody>
@@ -88,10 +98,25 @@
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript" src="js/zepto.js"></script>
 <script type="text/javascript" src="js/AjaxHelper.js"></script>
+<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script type="text/javascript">
     Vue.component('simple-grid', {
         template: '#grid-template',
-        props: ['dataList', 'columns']
+        props: ['dataList', 'columns'],
+        methods: {
+            /*
+            * 注：load-entry是Vue实例的事件，而不是simple-grid组件的事件，
+            * 尽管load-entry是写在simple-grid标签上的。详情请参考上一篇文章的编译作用域
+            * */
+            loadEntry: function(key) {
+                // 该方法调用$.dispatch向父组件派发事件load-entry，并将key作为事件的入参
+                this.$dispatch('load-entry', key)
+            },
+            deleteEntry: function(entry) {
+                // 调用$.dispatch向父组件派发时间delete-entry
+                this.$dispatch('delete-entry', entry);
+            }
+        }
     });
 
     Vue.component('modal-dialog', {
@@ -105,6 +130,8 @@
     });
     
     var ajaxHelper = new AjaxHelper();
+
+    // var axios = ('axios');
 
     var demo = new Vue({
         /*这个有时写漏了*/
@@ -125,7 +152,8 @@
             gridData: [],
             apiUrl: 'http://localhost:8080/api/customers',
             // 用于新增Customer或修改Customer
-            item: {}
+            item: {},
+            title: ''
         },
         ready : function () {
             this.getCustomers();
@@ -149,9 +177,58 @@
                 // 将vm.item 直接POST到服务端
                 ajaxHelper.post(vm.apiUrl,vm.item,callback);
                 this.show = false;
+            },
+            loadCustomer : function(customerId) {
+                var vm = this;
+                vm.gridData.forEach(function(item) {
+                    if(item.customerId === customerId) {
+                        // 使用$.set 设置item js 对象深拷贝
+                        vm.$set('item',JSON.parse(JSON.stringify(item)));
+                        return
+                    }
+                });
+                vm.$set('show',true);
+            },
+            saveCustomer:function() {
+                // 根据item.customerId是否有值确定修改模式和新建模式
+                this.item.customerId ? this.updateCustomer() : this.createCustomer();
+                this.show = false;
+            },
+            updateCustomer: function() {
+                // 定义vm变量，让它指向this，this是当前的Vue实例
+                var vm = this,
+                    callback = function(data) {
+                        vm.$set('item',{});
+                        // 更新成功后，重新加载页面数据
+                        vm.getCustomers();
+                    };
+                // 将vm.item直接PUT到服务器
+                ajaxHelper.put(vm.apiUrl + '/' + vm.item.customerId, vm.item, callback);
+            },
+            deleteCustomer: function(customer){
+                // 定义vm变量，让它指向this，this是当前的Vue实例
+                var vm = this,
+                    callback = function(data) {
+                        // 删除成功后，重新加载页面数据
+                        vm.getCustomers();
+                    };
+                // 将vm.item直接DELETE到服务器
+               ajaxHelper.delete(vm.apiUrl + '/' + customer.customerId, null, callback);
             }
         }
     });
+
+    /**
+     * 使用$watch跟踪data选项show属性的变化，每当关闭对话框时就重置item。
+     * 为什么要这么做呢？因为每次打开对话框，不知道是以新建模式还是修改模式打开的，
+     * 如果不重置item，倘若先以修改模式打开对话框(不保存，直接关闭)，再以新建模式打开对话框，新建模式的对话框将会显示上次打开的数据。
+     *
+     */
+    demo.$watch('show', function(newVal, oldVal){
+        if(!newVal){
+            this.item = {}
+        }
+    })
 
 </script>
 </html>
