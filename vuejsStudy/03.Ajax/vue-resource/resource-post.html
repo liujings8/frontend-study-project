@@ -5,7 +5,6 @@
     <title>Insert title here</title>
     <link rel="stylesheet" href="style.css"/>
     <link rel="stylesheet" href="fonts/iconfont.css">
-
 </head>
 <body>
 <div id="app">
@@ -76,12 +75,13 @@
     </div>
 </template>
 </body>
+<!-- <script src="http://static.runoob.com/assets/vue/1.0.11/vue.min.js"></script> -->
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript" src="js/vue-resource.js"></script>
 <script type="text/javascript">
     Vue.component('simple-grid', {
-        template: '#grid-template',
-        props: ['dataList', 'columns']
+        template : '#grid-template',
+        props : ['dataList', 'columns']
     });
     Vue.component('modal-dialog', {
         template: '#dialog-template',
@@ -114,7 +114,7 @@
                 name: 'phone'
             }],
             gridData: [],
-            apiUrl: 'http://localhost:8080/api/customers',
+            apiUrl: 'http://localhost:8080/api/customers{/id}',
             item: {}
         },
         ready: function () {
@@ -125,15 +125,21 @@
                 this.show = false;
             },
             getCustomers: function () {
+                var resource = this.$resource(this.apiUrl);
                 var vm = this;
-                vm.$http.get(this.apiUrl)
+                resource.get()
                 .then((response) => {
-                    this.$set('gridData', JSON.parse(response.body));
+                    vm.$set('gridData', JSON.parse(response.body));
+                })
+                .catch(function(response){
+                    console.log(response);
                 });
             },
             createCustomer: function () {
+                var resource = this.$resource(this.apiUrl);
                 var vm = this;
-                vm.$http.post(vm.apiUrl, vm.item)
+                console.log(typeof vm.item);
+                resource.save(vm.apiUrl, vm.item)
                     .then((response) => {
                         //  新增后清空item
                         vm.$set('item', {});

@@ -1,30 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="fonts/iconfont.css">
 </head>
 <body>
 	<div id="app">
 		<div class="container">
-			<simple-grid :data-list='gridData' :columns='gridColumns'></simple-grid>
+			<simple-grid :data-list="gridData" :columns="gridColumns"></simple-grid>
 		</div>
 	</div>
 	<template id="grid-template">
 		<table>
 			<thead>
 				<tr>
-					<th v-for="col in columns">
-						{{ col | capitalize}}
-					</th>				
-				</tr>			
+					<th v-for="col in columns">{{ col | capitalize}}</th>
+				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="(index,entry) in dataList">
-					<td v-for="col in columns">
-						{{ entry[col]}}
-					</td>
+					<td v-for="col in columns">{{ entry[col]}}</td>
 				</tr>
 			</tbody>		
 		</table>
@@ -40,24 +37,24 @@
 	});
 
 </script>
-<script>
+<script type="text/javascript">
 	var demo = new Vue({
 		el : '#app',
 		data : {
 			gridColumns : ['customerId','companyName','contactName','phone'],
 			gridData : [],
-			apiUrl: 'http://211.149.193.19:8080/api/customers{/id}'
+			apiUrl: 'http://localhost:8080/api/customers{/id}'
 		},
 		ready : function() {
 			this.getCustomers();
 		},
 		methods : {
 			getCustomers : function(){
+				var resource = vm.$resource(vm.apiUrl);
 				var vm = this;
-				var resource = vm.$resource(vm.apiUrl)
 				resource.get()
 					.then((response) => {
-						vm.$set('gridData',response.data)
+						vm.$set('gridData',JSON.parse(response.body));
 					})
 					.catch(function(response){
 						console.log(response);

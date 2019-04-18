@@ -10,7 +10,7 @@
 <body>
 <div id="app">
 	<div class="container">
-		<simple-grid :data-list="gridData" :columns="gridColumns" @load-entry="loadCustomer"></simple-grid>
+		<simple-grid :data-list="gridData" :columns="gridColumns" @load-entry="loadCustomer" @delete-entry="deleteCustomer"></simple-grid>
 	</div>
 	<div class="container">
 		<div class="form-group">
@@ -51,6 +51,7 @@
 		<thead>
 		<tr>
 			<th v-for="col in columns">{{ col.name | capitalize}}</th>
+			<th>Delete</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -60,6 +61,9 @@
                     <a href="javascript:void(0)" v-on:click="loadEntry(entry[col.name])">{{ entry[col.name] }}</a>
                 </span>
 				<span v-else>{{ entry[col.name] }}</span>
+			</td>
+			<td>
+				<button class="btn-danger" v-on:click="deleteEntry(entry)">delete</button>
 			</td>
 		</tr>
 		</tbody>
@@ -91,6 +95,9 @@
 		methods : {
 			loadEntry : function (key) {
 				this.$dispatch('load-entry',key);
+			},
+			deleteEntry : function (entry) {
+				this.$dispatch('delete-entry',entry);
 			}
 		}
 	});
@@ -178,6 +185,14 @@
 				resource.update({ id: vm.item.customerId},vm.item)
 					.then((response) => {
 						vm.$set('item', {});
+						vm.getCustomers();
+					})
+			},
+			deleteCustomer: function (customer) {
+				var resource = this.$resource(this.apiUrl);
+				var vm = this;
+				resource.remove({ id: customer.customerId})
+					.then((response) => {
 						vm.getCustomers();
 					})
 			}

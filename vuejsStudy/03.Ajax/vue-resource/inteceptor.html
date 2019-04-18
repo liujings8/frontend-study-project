@@ -4,13 +4,89 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fonts/iconfont.css">
 
 </head>
 <body>
-    <div id="help">
-        <loading v-show="showLoading"></loading>
+<div id="app">
+    <div class="container">
+        <simple-grid :data-list="gridData" :columns="gridColumns" @load-entry="loadCustomer" @delete-entry="deleteCustomer"></simple-grid>
     </div>
-</body>
+    <div class="container">
+        <div class="form-group">
+            <button v-on:click="this.show = true">Create</button>
+        </div>
+    </div>
+    <modal-dialog v-bind:show.sync="show">
+        <header class="dialog-header" slot="header">
+            <h1 class="dialog-title">{{ item.customerId ? 'Edit Customer - ' + item.contactName : 'Create New Customer' }}</h1>
+        </header>
+        <div class="dialog-body" slot="body">
+            <!--item.customerId为空则不显示-->
+            <div v-show="item.customerId" class="form-group">
+                <label>Customer Id</label>
+                <input type="text" v-model="item.customerId"  disabled="disabled">
+            </div>
+            <div class="form-group">
+                <label>Company Name</label>
+                <input type="text" v-model="item.companyName">
+            </div>
+            <div class="form-group">
+                <label>Contact Name</label>
+                <input type="text" v-model="item.contactName">
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="text" v-model="item.phone">
+            </div>
+            <div class="form-group">
+                <label></label>
+                <button v-on:click="saveCustomer">Save</button>
+            </div>
+        </div>
+    </modal-dialog>
+</div>
+<div id="help">
+    <loading v-show="showLoading"></loading>
+</div>
+<template id="grid-template">
+    <table>
+        <thead>
+        <tr>
+            <th v-for="col in columns">{{ col.name | capitalize}}</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(index,entry) in dataList">
+            <td v-for="col in columns">
+                <span v-if="col.isKey">
+                    <a href="javascript:void(0)" v-on:click="loadEntry(entry[col.name])">{{ entry[col.name] }}</a>
+                </span>
+                <span v-else>{{ entry[col.name] }}</span>
+            </td>
+            <td>
+                <button class="btn-danger" v-on:click="deleteEntry(entry)">delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</template>
+<template id="dialog-template">
+    <div class="dialogs">
+        <div class="dialog" v-bind:class="{'dialog-active' : show}">
+            <div class="dialog-content">
+                <div class="close rotate">
+                    <span class="iconfont icon-close" v-on:click="close"></span>
+                </div>
+                <slot name="header"></slot>
+                <slot name="body"></slot>
+                <slot name="footer"></slot>
+            </div>
+        </div>
+        <div class="dialog-overlay"></div>
+    </div>
+</template>
 <!--添加一个loading组件-->
 <template id="loading-template">
     <div class="loading-overlay">
@@ -21,11 +97,35 @@
         </div>
     </div>
 </template>
-<script type="text/javascript" src="js/vue.js">
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/vue-resource.js"></script>
+<script>
+    Vue.component('simple-grid', {
+        template: '#grid-template',
+        props: ['dataList', 'columns'],
+        methods : {
+            loadEntry : function (key) {
+                this.$dispatch('load-entry',key);
+            },
+            deleteEntry : function (entry) {
+                this.$dispatch('delete-entry',entry);
+            }
+        }
+    });
+    Vue.component('modal-dialog', {
+        template: '#dialog-template',
+        props: ['show'],
+        methods: {
+            close: function () {
+                this.show = false;
+            }
+        }
+    })
 </script>
 <script>
     /*将loading组件作为另外一个Vue实例的子组件*/
     var help = new Vue({
+        /*将该Vue实例挂载到某个HTML元素*/
         el: '#help',
         data: {
             showLoading: false
@@ -37,13 +137,113 @@
         }
     });
 
+    /*添加interceptor*/
     Vue.http.interceptors.push((request, next) => {
-        loading.show = true;
+        /*发送请求前的处理逻辑 start*/
+        help.showLoading = true;
+        /*发送请求前的处理逻辑 end*/
         next((response) =>{
-            loading.show = false;
+            /*发送请求后的处理逻辑*/
+            help.showLoading = false;
+            /*根据请求的状态，response参数会返回给successCallback或errorCallback*/
             return response;
         });
-    }
+    });
+
+    /*
+     * 如果Web服务器无法处理编码为application/json的请求，你可以启用emulateJSON选项。
+     * 启用该选项后，请求会以application/x-www-form-urlencoded作为MIME type，就像普通的HTML表单一样。
+     */
+    Vue.http.options.emulateJSON = true;
+    var demo = new Vue({
+        el: '#app',
+        data: {
+            show : false,
+            title : '',
+            gridColumns: [{
+                name: 'customerId',
+                isKey: true
+            }, {
+                name: 'companyName'
+            }, {
+                name: 'contactName'
+            }, {
+                name: 'phone'
+            }],
+            gridData: [],
+            apiUrl: 'http://localhost:8080/api/customers{/id}',
+            item: {}
+        },
+        ready: function () {
+            this.getCustomers();
+        },
+        methods: {
+            closeDialog: function () {
+                this.show = false;
+            },
+            loadCustomer : function (customerId) {
+                var vm = this;
+                vm.gridData.forEach(function (item) {
+                    if(item.customerId === customerId){
+                        vm.$set('item',JSON.parse(JSON.stringify(item)));
+                        vm.$set('show',true);
+                        return;
+                    }
+                })
+            },
+            saveCustomer : function () {
+                this.item.customerId ? this.updateCustomer() : this.createCustomer();
+                this.show = false;
+            },
+            getCustomers: function () {
+                var resource = this.$resource(this.apiUrl);
+                var vm = this;
+                resource.get()
+                    .then((response) => {
+                    vm.$set('gridData', JSON.parse(response.body));
+                })
+                .catch(function(response){
+                    console.log(response);
+                });
+            },
+            createCustomer: function () {
+                var resource = this.$resource(this.apiUrl);
+                var vm = this;
+                resource.save(vm.apiUrl, vm.item)
+                    .then((response) => {
+                    //  新增后清空item
+                    vm.$set('item', {});
+                    vm.getCustomers();
+                });
+                this.show = false;
+            },
+            updateCustomer: function () {
+                var resource = this.$resource(this.apiUrl);
+                var vm = this;
+                resource.update({ id: vm.item.customerId},vm.item)
+                    .then((response) => {
+                    vm.$set('item', {});
+                    vm.getCustomers();
+                });
+            },
+            deleteCustomer: function (customer) {
+                var resource = this.$resource(this.apiUrl);
+                var vm = this;
+                resource.remove({ id: customer.customerId})
+                    .then((response) => {
+                    vm.getCustomers()
+                });
+            }
+        }
+    });
+
+    /* 作用是每次show一次就清空一次 */
+    demo.$watch('show', function(newVal, oldVal) {
+        if (!newVal) {
+            this.item = {}
+        }
+    })
 
 </script>
+</body>
 </html>
