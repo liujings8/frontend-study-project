@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <span id="message">{{msg}}</span>
+        </div>
+        <div class="container">
+            <div class="form-group">
+                <label>电子邮箱</label>
+                <input type="text" v-model="registerModel.username"/>
+            </div>
+            <div class="form-group">
+                <label>密码</label>
+                <input type="text" v-model="registerModel.password"/>
+            </div>
+            <div class="form-group">
+                <label>确认密码</label>
+                <input type="text" v-model="registerModel.confirmPassword"/>
+            </div>
+            <div class="form-group">
+                <label></label>
+                <button @click="register">注册</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="js/vue.js"></script>
+<script src="js/zepto.js"></script>
+<script>
+    var demo = new Vue({
+        el: '#app',
+        data: {
+            registerUrl: 'http://localhost:8080/api/user/register',
+            registerModel: {
+                username: '',
+                password: '',
+                confirmPassword: ''
+            },
+            msg: ''
+        },
+        methods: {
+            register: function () {
+                var vm = this;
+                vm.msg = '';
+                $.ajax({
+                    url: vm.registerUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: vm.registerModel,
+                    success: function (data) {
+                        if (data.resultCode == '1'){
+                            vm.msg = '注册成功!'
+                        } else{
+                            vm.msg = data.errorCode;
+                        }
+                    },
+                    error: vm.requestError
+                });
+
+            },
+            requestError: function(xhr,errorType,error){
+                this.msg = xhr.responseText;
+            }
+        }
+    });
+
+</script>
+</html>

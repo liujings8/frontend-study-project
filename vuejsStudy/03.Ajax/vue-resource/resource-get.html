@@ -43,14 +43,14 @@
 		data : {
 			gridColumns : ['customerId','companyName','contactName','phone'],
 			gridData : [],
-			apiUrl: 'http://localhost:8080/api/customers{/id}'
+			apiUrl: 'http://localhost:8080/api/customer{/id}'
 		},
 		ready : function() {
 			this.getCustomers();
 		},
 		methods : {
 			getCustomers : function(){
-				var resource = vm.$resource(vm.apiUrl);
+				var resource = this.$resource(this.apiUrl);
 				var vm = this;
 				resource.get()
 					.then((response) => {
