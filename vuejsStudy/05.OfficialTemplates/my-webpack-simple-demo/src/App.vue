@@ -1,60 +1,48 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <h2>This is a grid component build with vue-webpack-simple scaffolding!</h2>
+    <div id="searchBar">
+      Search <input type="text" v-model="searchQuery"/>
+    </div>
+    <simple-grid v-bind:data="gridData" v-bind:columns="gridColumns" v-bind:filter-key="searchQuery" v-bind:sort-order="sortOrder">
+    </simple-grid>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
+  import simpleGrid from './components/simpleGrid.vue';
+
+  export default {
+    data() {
+      return {
+        searchQuery: '',
+        // order > 0：正序，order < 0：倒序
+        sortOrder: {
+          column: 'name',
+          order: 1
+        },
+        gridColumns: ['name', 'power'],
+        gridData: [{
+          name: 'Chuck Norris',
+          power: Infinity
+        }, {
+          name: 'Bruce Lee',
+          power: 9000
+        }, {
+          name: 'Jackie Chan',
+          power: 7000
+        }, {
+          name: 'Jet Li',
+          power: 8000
+        }]
+      }
+    },
+    components: {
+      simpleGrid
     }
   }
-}
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
+  @import url("./assets/app.css");
 </style>
