@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--
+        路由的切换过程，本质上是执行一系列路由钩子函数，钩子函数总体上分为两大类：
+        1. 全局的钩子函数
+        2.组件的钩子函数
+
+        全局的钩子函数定义在全局路由对象中，组件的钩子函数则定义在组件的route选项中。
+        全局钩子函数有2个：
+        1. beforeEach: 在路由切换开始时调用
+        2. afterEach: 在每次路由成功进入激活阶段时被调用
+    -->
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.4.1/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/custom.css" />
+</head>
+
+<body>
+    <div id="app">
+        <div row="row">
+            <div class="col-xs-offset-2 col-xs-8">
+                <div class="page-header">
+                    <h2>Router Basic - 06</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-offset-2 col-xs-2">
+                <div class="list-group">
+                    <!--使用指令v-link进行导航-->
+                    <a class="list-group-item" v-link="{path: '/home', activeClass: 'active'}">Home</a>
+                    <a class="list-group-item" v-link="{path: '/about', activeClass: 'active'}">About</a>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="panel">
+                    <div class="panel-body">
+                        <!--用于渲染匹配的组件-->
+                        <router-view></router-view>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-offset-2 col-xs-8">
+                <div class="well">
+                    {{ msg }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <template id="home">
+        <div>
+            <h1>Home</h1>
+            <p>{{msg}}</p>
+        </div>
+        <div>
+            <ul class="nav nav-tabs">
+                <li>
+                    <a v-link="{path: '/home/news'}">News</a>
+                </li>
+                <li>
+                    <a v-link="{path: '/home/message'}">Messages</a>
+                </li>
+            </ul>
+            <router-view></router-view>
+            <!--用于渲染匹配的组件-->
+        </div>
+    </template>
+    <template id="news">
+        <ul>
+            <li><a v-link="{name: 'detail', params: {id: '01'}}">News 01</a></li>
+            <li><a v-link="{path: '/home/news/detail/02'}">News 02</a></li>
+            <li><a v-link="{path: '/home/news/detail/03'}">News 03</a></li>
+        </ul>
+        <router-view></router-view>
+    </template>
+    <template id="message">
+        <ul>
+            <li>Message 01</li>
+            <li>Message 02</li>
+            <li>Message 03</li>
+        </ul>
+    </template>
+    <template id="about">
+        <div>
+            <h1>About</h1>
+            <p>This is the tutorial about vue-router.</p>
+        </div>
+    </template>
+    <template id="newsDetail">
+        <div>
+            News Detail - {{$route.params.id}} ......
+        </div>
+    </template>
+
+</body>
+<script src="js/vue.js"></script>
+<script src="js/vue-router.js"></script>
+<script>
+    var well = new Vue({
+        el: '.well',
+        data: {
+            msg: '',
+            color: '#ff0000'
+        },
+        methods: {
+            setColor: function () {
+                this.color = '#' + parseInt(Math.random() * 256).toString()
+                    + parseInt(Math.random() * 256).toString(16)
+                    + parseInt(Math.random() * 256).toString(16)
+            },
+            setColoredMessage: function (msg) {
+                this.msg += msg;
+            },
+            setTitle: function () {
+                this.msg += '<h2 style="color: #333">' + this.msg + '</h2>'
+            }
+        }
+    });
+
+    function RouteHelper(name) {
+        var route = {
+            canReuse: function(transition){
+                well.setColoredMessage('执行组件' + name + '的钩子函数: canReuse');
+                return true;
+            },
+            canActivate: function(transition){
+                well.setColoredMessage('执行组件' + name + '的钩子函数: canActive');
+            },
+            activate: function(transition){
+                well.setColoredMessage('执行组件' + name + '的钩子函数: activate');
+                transition.next();
+            },
+            canDeactivate: function(transition){
+                well.setColoredMessage('执行组件' + name + '的钩子函数: canDeactivate');
+                transition.next();
+            },
+            deactivate: function (transition) {
+                well.setColoredMessage('执行组件' + name + '的钩子函数: deactivate');
+                transition.next();
+            },
+            data: function(){
+                well.setColoredMessage('执行组件' + name + '的钩子函数: data');
+                transition.next();
+            }
+        }
+        return route;
+    }
+
+    // 1.创建组件：创建单页面应用需要渲染的组件
+    var Home = Vue.extend({
+        template: '#home',
+        data: function(){
+            return {
+                msg: 'Hello, vue router!'
+            }
+        },
+        route: RouteHelper('home')
+    });
+
+    var About = Vue.extend({
+        template: '#about'
+    });
+
+    /*
+     * 这里有一个概念，/home/news和/home/message是/home路由的子路由，
+     * 与之对应的NewsheMessage组件并不是Home的子组件。
+     */
+    var News = Vue.extend({
+        template: '#news'
+    });
+
+    var Message = Vue.extend({
+        template: '#message'
+    });
+
+    var NewsDetail = Vue.extend({
+        template: '#newsDetail'
+    });
+
+    // 2.创建路由：调用构造器，创建一个路由器实例router。
+    var router = new VueRouter();
+
+    // 3.映射路由：调用router的map方法映射路由。每条路由以key-value的形式存在，key是路径，value是组件。
+    router.map({
+        '/home': {
+            component: Home,
+            /*
+             * 定义子路由 嵌套路由，实现要点
+             * 1.在组件内部使用<router-view>标签
+             * 2.在路由器对象中给组件定义子路由
+             */
+            subRoutes: {
+                '/news': {
+                    // 给该路由指定name属性
+                    name: 'news',
+                    component: News,
+                    subRoutes: {
+                        // /:id是路由参数
+                        'detail/:id': {
+                            name: 'detail',
+                            component: NewsDetail
+                        }
+                    }
+                },
+                '/message': {
+                    component: Message
+                }
+            }
+        },
+        '/about': {component: About},
+    });
+
+    // 应用在首次运行时右侧是一片空白，应用通常都会有一个首页，例如：Home页。使用router.redirect方法将根路径重定向到/home路径
+    // router.redirect方法用于为路由器定义全局的重定向规则，全局的重定向会在匹配当前路径之前执行。
+    router.redirect({
+        '/': '/home'
+    })
+
+    router.beforeEach(function(transition){
+        well.setColor();
+        well.setTitle();
+        well.setColoredMessage();
+        transition.next();
+    });
+
+    router.afterEach(function(transition){
+        well.setColoredMessage();
+
+    });
+
+    // 路由器的运行需要一个根组件，router.start(App,'#app') 表示router会创建一个App实例，并且挂载到#app元素。
+    // 使用vue-router的应用，不需要显示地创建vue实例，而是调用start方法将根组件挂载到某个元素。
+    var App = Vue.extend({});
+    // 启动路由
+    router.start(App,'#app');
+
+    /**
+     * 执行过程
+     */
+    // 当用户点击v-link指令元素时，我们可以大致猜想一下这中间发生了什么事情
+    // 然后根据路由找到匹配的组件
+    // 最后将组件渲染到<router-view>标签
+
+
+</script>
+</html>
