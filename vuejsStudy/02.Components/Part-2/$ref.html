@@ -9,6 +9,10 @@
         <parent-component></parent-component>
     </div>
 
+    <!--
+        组件个数较多时，我们难以记住各个组件的顺序和位置，通过序号访问子组件不是很方便。
+        在子组件上使用v-ref指令，可以给子组件指定一个索引ID:
+    -->
     <template id="parent-component">
         <child-component1 v-ref:cc1></child-component1>
         <child-component2 v-ref:cc2></child-component2>

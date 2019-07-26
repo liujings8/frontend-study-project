@@ -58,3 +58,11 @@
 
 </script>
 </html>
+
+<!--
+我们将这个示例分为几个步骤解读：
+1.父组件的button元素绑定了click事件，该事件指向notify方法
+2.父组件的notify方法在处理时，调用了$broadcast，将事件派发到父组件的parent-msg事件，
+并给该事件提供了一个msg参数
+3.子组件的events选项中定义了parent-msg事件，子组件接收到父组件的广播后，调用parent-msg事件
+-->

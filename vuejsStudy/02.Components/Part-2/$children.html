@@ -26,6 +26,14 @@
 </body>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript">
+    /*
+     * 下面这段代码定义了三个组件，父组件parent-component,
+     * 两个子组件child-component1和child-component2.
+     *
+     * 在父组件中，通过this.$children可以访问子组件.
+     * this.$children是一个数组，它包含所有子组件的实例。
+     *
+     * */
     Vue.component('parent-component',{
         template : '#parent-component',
         components : {

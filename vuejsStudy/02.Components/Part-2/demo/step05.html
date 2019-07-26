@@ -9,7 +9,8 @@
          * 由于IE不支持<template>标签，所以template标签中的内容在IE下会直接显示出来。
          * 将模板设为隐藏即可解决这个问题，template标签各浏览器支持请参考：http://caniuse.com/#feat=template
          */
-        #grid-template{
+        #grid-template,
+        #dialog-template{
             display : none;
         }
     </style>
@@ -24,11 +25,13 @@
 <body>
     <div id="app">
         <div class="container">
-            <label>Search</label>
-             <input type="text" class="search-input" v-model="searchQuery">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="text" class="search-input" v-model="searchQuery">
+            </div>
         </div>
         <div class="container">
-            <!--    使用了v-bind指令的缩写。 -->
+            <!-- 使用了v-bind指令的缩写。-->
             <simple-grid :data-list="people" :columns="columns" :search-key="searchQuery"></simple-grid>
         </div>
     </div>
@@ -38,7 +41,7 @@
             <thead>
                 <tr>
                     <th v-for="col in columns">
-                        <!--    使用了capitalize过滤器，将字符串的首字母转换为大写后输出。  -->
+                        <!-- 使用了capitalize过滤器，将字符串的首字母转换为大写后输出。-->
                         {{ col.name | capitalize }}
                     </th>
                     <th>
@@ -47,7 +50,9 @@
                 </tr>
             </thead>
             <tbody>
-                <!--    使用了filterBy过滤器，根据指定条件过滤数组元素，filterBy返回过滤后的数组。   -->
+                <!-- 使用了filterBy过滤器，根据指定条件过滤数组元素，filterBy返回过滤后的数组。 -->
+                <!-- 数组默认的索引名称为$index, v-for="(index,entry) in dataList" 使用了索引别名
+                    括号中的第一个参数index是$index的别名，第二个参数是遍历的数组元素 -->
                 <tr v-for="(index,entry) in dataList | filterBy searchKey">
                     <td v-for="col in columns">
                         <span v-if="col.isKey">
@@ -55,10 +60,10 @@
                                 {{ entry[col.name] }}
                             </a>
                         </span>
-                        <span v-else="col.isKey">{{ entry[col.name] }}</span>
+                        <span v-else>{{ entry[col.name] }}</span>
                     </td>
                     <td class="text-center">
-                        <!--    使用了v-on指令的缩写，@click是v-on:click的缩写。  -->
+                        <!-- 使用了v-on指令的缩写，@click是v-on:click的缩写。-->
                         <button class="btn-danger" @click="deleteItem(entry)">delete</button>
                     </td>
                 </tr>
@@ -67,7 +72,7 @@
         <div class="container">
             <button @click="openNewItemDialog('Create New item')">Create</button>
         </div>
-        <!--    在<modal-dialog>标签上给sample-grid绑定一个自定义事件create-item，后面在$dispatch派发事件时会用到。    -->
+        <!-- 由于保存按钮是在子组件modal-dialog中，在<modal-dialog>标签上给sample-grid绑定一个自定义事件create-item，后面在$dispatch派发事件时会用到。-->
 
         <!--create-item是一个自定义事件，
             由子组件modal-dialog调用this.$dispatch('create-item') 派发到自定义事件create-item，
@@ -85,6 +90,11 @@
                     <header class="dialog-header">
                         <h1 class="dialog-title">{{ title }}</h1>
                     </header>
+                    <!--
+                        在modal-dialog组件的模板中遍历fields，然后显示field的名称。
+                        在渲染表单时，根据是否有dataSource判定表单时下拉框还是文本框。
+                        注意: modal-dialog组件的fields是由Vue实例传递给simple-grid，然后再由simple-grid传递过来的。
+                    -->
                     <div v-for="field in fields" class="form-group">
                         <label>{{ field.name }}</label>
                         <!--在修改模式下（mode = 2），如果当前字段是主键字段，则禁止修改。-->
@@ -93,10 +103,12 @@
                         </select>
                         <input v-else type="text" v-model="item[field.name]" :disabled="mode===2 && field.isKey">
                     </div>
-                    <footer class="form-group">
-                        <label></label>
-                        <button class="btn-save" v-on:click="save">Save</button>
-                        <button class="btn-close" v-on:click="close">Close</button>
+                    <footer class="dialog-footer">
+                        <div class="form-group">
+                            <label></label>
+                            <button class="btn-save" v-on:click="save">Save</button>
+                            <button class="btn-close" v-on:click="close">Close</button>
+                        </div>
                     </footer>
                 </div>
             </div>
@@ -111,10 +123,11 @@
     /*  Vue.component是创建并注册组件的语法糖，使用Vue.component注册的组件是全局的。 */
     Vue.component('simple-grid',{
         template : '#grid-template',
-        /*  #app元素是父组件，simple-grid是子组件。
+        /*  使用props将父组件数据传递给子组件
+         #app元素是父组件，simple-grid是子组件。
          在simple-grid组件中定义选项props: ['dataList', 'columns', 'searchKey']
          在#app下使用<simple-grid :data-list="people" :columns="columns" :search-key="searchQuery">
-         将数据传递给simple-grid组件    */
+         将数据传递给simple-grid组件 */
         props : ['dataList','columns','searchKey'],
         /*  组件的data选项必须以函数的方式返回 */
         data : function() {
@@ -134,7 +147,7 @@
             for(var i=0;i<this.columns.length;i++){
                 if(this.columns[i].isKey){
                     this.keyColumn = this.columns[i]['name'];
-                    // alert(this.keyColumn);
+                    //alert(this.keyColumn);
                     break;
                 }
             }
@@ -171,9 +184,9 @@
             },
             /*createItem方法用于保存新建的数据，this.$broadcast('showDialog', false)
                 调用子组件modal-dialog的showDialog事件，传入参数false表示隐藏对话框。*/
-            /*由于主键列数据是不能重复的，所以在新增数据时需要判断主键列数据是否已经存在。*/
             createItem : function(){
                 var keyColumn = this.keyColumn;
+                // 由于主键列数据是不能重复的，所以在新增数据时需要判断主键列数据是否已经存在。
                 if(!this.itemExists(keyColumn)){
                     //将item追加到dataList
                     this.dataList.push(this.item);
@@ -184,7 +197,6 @@
                 }else{
                     alert(keyColumn + ' "' + this.item[keyColumn] + '" is already exists');
                 }
-
             },
             itemExists : function (keyColumn) {
                 // alert(keyColumn);
@@ -249,7 +261,9 @@
                 this.item = {};
             }
         },
-        /*  modal-dialog组件在simple-grid组件中注册：    */
+        /* 由于对话框的内容来源于具体的数据，所以我们可以考虑将对话框作为simple-grid组件的一个子组件 */
+        /* modal-dialog组件没有使用Vue.component进行全局注册，使用simple-grid组件components选项实现了局部注册 */
+        /* modal-dialog组件在simple-grid组件中注册：  */
         components : {
             'modal-dialog' : {
                 template : '#dialog-template',
@@ -271,16 +285,16 @@
                         this.show = false;
                     },
                     save : function () {
-                       //   新建模式
+                       // 新建模式
                         if(this.mode === 1){
                             /*  由于保存按钮是在子组件modal-dialog中的，
                                 而createItem方法是在父组件simple-grid中的，
                                 所以这里使用this.$dispatch('create-item') 派发到父组件的自定义事件create-item。
                             */
-                            //使用$dispatch调用simple-grid的create-item方法
+                            // 使用$dispatch调用simple-grid的create-item事件
                             this.$dispatch('create-item');
                         }else if(this.mode === 2){
-                            //使用$dispatch调用simple-grid的update-item方法
+                            // 使用$dispatch调用simple-grid的update-item方法
                             this.$dispatch('update-item');
                         }
                     }

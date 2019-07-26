@@ -20,11 +20,13 @@
 <body>
     <div id="app">
         <div class="container">
-            <label>Search</label>
-             <input type="text" class="search-input" v-model="searchQuery">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="text" class="search-input" v-model="searchQuery">
+            </div>
         </div>
         <div class="container">
-            <!-- 使用了v-bind指令的缩写。 -->
+            <!-- 使用了v-bind指令的缩写。-->
             <simple-grid :data-list="people" :columns="columns" :search-key="searchQuery"></simple-grid>
         </div>
     </div>
@@ -34,7 +36,7 @@
             <thead>
                 <tr>
                     <th v-for="col in columns">
-                        <!-- 使用了capitalize过滤器，将字符串的首字母转换为大写后输出。 -->
+                        <!-- 使用了capitalize过滤器，将字符串的首字母转换为大写后输出。-->
                         {{ col.name | capitalize }}
                     </th>
                     <th>
@@ -51,7 +53,7 @@
                         {{ entry[col.name] }}
                     </td>
                     <td class="text-center">
-                        <!-- 使用了v-on指令的缩写，@click是v-on:click的缩写。 -->
+                        <!-- 使用了v-on指令的缩写，@click是v-on:click的缩写。-->
                         <button class="btn-danger" @click="deleteItem(index)">delete</button>
                     </td>
                 </tr>
@@ -77,7 +79,7 @@
         }
     });
 
-    var demo=new Vue({
+    var demo = new Vue({
         el : '#app',
         data : {
             searchQuery : '',
@@ -107,6 +109,5 @@
             }]
         }
     });
-
 </script>
 </html>
